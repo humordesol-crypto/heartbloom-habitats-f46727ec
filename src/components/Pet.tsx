@@ -58,7 +58,7 @@ export function Pet({ mood, floaters, onTap }: Props) {
       <motion.button
         onClick={onTap}
         whileTap={{ scale: 0.95 }}
-        className="relative z-10 outline-none"
+        className="relative outline-none"
         aria-label="Fazer carinho no pet"
       >
         <AnimatePresence mode="wait">
