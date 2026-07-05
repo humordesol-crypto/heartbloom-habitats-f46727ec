@@ -238,36 +238,7 @@ function PetBody({ size, mood, behavior, reaction, thought, hat, gazeX, gazeY, o
     return () => { cancelled = true; clearTimeout(t); };
   }, [isDead]);
 
-  const eyesClosed =
-    isDead ||
-    mood === "sleep" ||
-    mood === "crying" ||
-    behavior === "yawn" ||
-    (mood === "inlove" && Math.random() < 0) || // handled with heart-eyes below
-    blink;
-
-  const heartEyes = mood === "inlove";
-  const angryBrows = mood === "angry";
-  const worriedBrows = mood === "scared" || mood === "sick";
-
-  const mouthPath = mouthForMood(mood, behavior);
-  const cheekBlush = mood === "inlove" || mood === "happy" || mood === "excited" || mood === "hot";
-  const skin = mood === "sick" ? "#c8d9c0" : mood === "cold" ? "#c8d6e6" : mood === "hot" ? "#f6b6b8" : "#f7c9d7";
-  const skinDark = mood === "sick" ? "#a3b699" : mood === "cold" ? "#9db4c6" : mood === "hot" ? "#e08f95" : "#e79fb6";
-
-  // Tail wag speed by mood
-  const tailWagSpeed =
-    mood === "play" || mood === "excited" ? 0.35 :
-    mood === "happy" || mood === "inlove" ? 0.6 :
-    mood === "sad" || mood === "sick" || mood === "crying" ? 2.5 :
-    isDead ? 0 : 1.4;
-
-  // Ear angles for emotion
-  const earBase =
-    mood === "sad" || mood === "crying" || mood === "sick" ? 20 :
-    mood === "scared" ? 35 :
-    mood === "angry" ? -25 :
-    mood === "inlove" || mood === "happy" ? -5 : 0;
+  // Kept for helpers below (unused vars intentionally omitted)
 
   return (
     <motion.button
