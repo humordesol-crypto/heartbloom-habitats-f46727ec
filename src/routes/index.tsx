@@ -116,11 +116,16 @@ function HomeScreen() {
         <StatBar icon={Sparkles} label="Higiene" value={state.stats.hygiene} tone="hygiene" />
         <StatBar icon={Gamepad2} label="Diversão" value={state.stats.fun} tone="fun" />
         <StatBar icon={Heart} label="Carinho" value={state.stats.love} tone="love" />
+        <div className="col-span-2">
+          <StatBar icon={HeartPulse} label="Saúde" value={state.stats.health} tone="love" />
+        </div>
       </section>
 
       {/* Pet stage */}
       <section
-        className="relative mt-4 flex-1 min-h-[280px] rounded-[2rem] overflow-hidden border border-white/70 shadow-lift"
+        className={`relative mt-4 flex-1 min-h-[280px] rounded-[2rem] overflow-hidden border border-white/70 shadow-lift transition-colors ${
+          isCritical ? "ring-4 ring-destructive/40" : ""
+        }`}
         style={{ background: wpBg }}
       >
         <div className="pointer-events-none absolute inset-0">
@@ -130,6 +135,19 @@ function HomeScreen() {
           {state.wallpaper === "space" && <SpaceDecor />}
         </div>
 
+        {/* Critical overlay */}
+        {isCritical && (
+          <motion.div
+            className="pointer-events-none absolute inset-0"
+            animate={{ opacity: [0.35, 0.6, 0.35] }}
+            transition={{ duration: 2, repeat: Infinity }}
+            style={{
+              background:
+                "radial-gradient(circle at center, transparent 40%, color-mix(in oklab, var(--destructive) 45%, transparent) 100%)",
+            }}
+          />
+        )}
+
         <div className="relative h-full flex items-center justify-center pt-4">
           <Pet
             mood={mood}
@@ -138,8 +156,44 @@ function HomeScreen() {
             hat={state.equippedHat}
             floaters={floaters}
             onTap={() => doAction("pet", "💖")}
+            isDead={state.isDead}
+            isCritical={isCritical}
           />
         </div>
+
+        {/* Critical banner */}
+        <AnimatePresence>
+          {isCritical && (
+            <motion.div
+              initial={{ y: -20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -20, opacity: 0 }}
+              className="absolute top-3 left-3 right-3 flex items-center gap-2 rounded-2xl bg-destructive/95 text-destructive-foreground px-3 py-2 shadow-lift"
+            >
+              <AlertTriangle className="h-4 w-4 shrink-0" />
+              <span className="text-xs font-bold leading-tight">
+                {state.name} precisa de você agora! Alimente, hidrate ou dê remédio.
+              </span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Greeting */}
+        <AnimatePresence>
+          {greeting && !isCritical && (
+            <motion.button
+              onClick={dismissGreeting}
+              initial={{ y: -20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -20, opacity: 0 }}
+              className="absolute top-3 left-3 rounded-2xl glass-card px-3 py-2 text-xs font-bold shadow-soft"
+            >
+              {greeting === "missed"
+                ? `😢 ${state.name} sentiu sua falta!`
+                : `😊 Que bom te ver!`}
+            </motion.button>
+          )}
+        </AnimatePresence>
 
         <div
           className={`absolute top-3 right-3 rounded-full glass-card px-3 py-1 text-[11px] font-bold uppercase tracking-wider ${
