@@ -9,8 +9,8 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 
-import "@fontsource-variable/nunito";
-import "@fontsource-variable/fredoka";
+import "@fontsource-variable/nunito/index.css";
+import "@fontsource-variable/fredoka/index.css";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
