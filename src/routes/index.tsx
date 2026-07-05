@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import {
   Drumstick,
   Droplets,
@@ -16,6 +16,8 @@ import {
   ShoppingBag,
   Shirt,
   User,
+  HeartPulse,
+  AlertTriangle,
 } from "lucide-react";
 import { usePet, personalityLabel, stageLabel } from "@/lib/pet-store";
 import { Pet } from "@/components/Pet";
@@ -24,6 +26,7 @@ import { ActionButton } from "@/components/ActionButton";
 import { ShopModal } from "@/components/ShopModal";
 import { MemoryGame } from "@/components/MemoryGame";
 import { WardrobeModal, wallpaperCSS } from "@/components/WardrobeModal";
+import { MemorialScreen } from "@/components/MemorialScreen";
 
 export const Route = createFileRoute("/")({
   head: () => ({
