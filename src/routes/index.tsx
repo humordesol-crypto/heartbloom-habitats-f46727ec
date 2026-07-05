@@ -65,6 +65,10 @@ function HomeScreen() {
     setWallpaper,
     rewardGame,
     floaters,
+    isCritical,
+    greeting,
+    dismissGreeting,
+    startNewPet,
   } = usePet();
   const [panel, setPanel] = useState<Panel>(null);
   const xpForLevel = state.level * 25;
