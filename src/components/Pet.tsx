@@ -427,127 +427,48 @@ function PetBody({ size, mood, behavior, reaction, thought, hat, gazeX, gazeY, o
 /*                          BODY PARTS                          */
 /* ============================================================ */
 
-function Ear({
-  side, mood, behavior, baseAngle, skin,
-}: {
-  side: "left" | "right"; mood: Mood; behavior: Behavior; baseAngle: number; skin: string;
-}) {
-  const isLeft = side === "left";
-  const cx = isLeft ? 62 : 138;
-  const cy = 85;
-  const origin = `${cx}px ${cy + 15}px`;
-  const rotate =
-    behavior === "ear-wiggle"
-      ? [baseAngle, baseAngle + (isLeft ? 20 : -20), baseAngle - 5, baseAngle]
-      : behavior === "walk-left" || behavior === "walk-right"
-      ? [baseAngle - 4, baseAngle + 4, baseAngle - 4]
-      : mood === "scared"
-      ? [baseAngle, baseAngle + 2, baseAngle]
-      : [baseAngle, baseAngle + (isLeft ? -3 : 3), baseAngle];
-  const duration = behavior === "ear-wiggle" ? 0.9 : 3.6;
-
+/* Eyelid overlay (matches the pink eye ring; scales down to blink) */
+function Eyelid({ side, closed }: { side: "left" | "right"; closed: boolean }) {
+  const left = side === "left" ? "34%" : "52%";
   return (
-    <motion.g
-      style={{ transformOrigin: origin }}
-      animate={{ rotate }}
-      transition={{ duration, repeat: Infinity, ease: "easeInOut" as const }}
+    <motion.div
+      className="absolute rounded-[45%] pointer-events-none"
+      style={{
+        left,
+        top: "39.5%",
+        width: "14%",
+        height: "10%",
+        background: "linear-gradient(180deg, #f0a4b8, #e78ea6)",
+        transformOrigin: "50% 0%",
+        boxShadow: "inset 0 -2px 3px rgba(0,0,0,0.15)",
+      }}
+      animate={{ scaleY: closed ? 1 : 0 }}
+      transition={{ duration: 0.12, ease: "easeOut" as const }}
+    />
+  );
+}
+
+/* Big pink heart over each eye */
+function HeartEye({ side }: { side: "left" | "right" }) {
+  const left = side === "left" ? "35%" : "53%";
+  return (
+    <motion.div
+      className="absolute flex items-center justify-center pointer-events-none text-[46px] leading-none"
+      style={{ left, top: "38%", width: "12%", height: "10%", color: "#ff4d7d" }}
+      animate={{ scale: [1, 1.18, 1] }}
+      transition={{ duration: 0.9, repeat: Infinity, ease: "easeInOut" as const }}
     >
-      <ellipse cx={cx} cy={cy} rx="18" ry="30" fill={skin} />
-      <ellipse cx={cx} cy={cy + 4} rx="9" ry="20" fill="url(#earInner)" />
-    </motion.g>
+      ♥
+    </motion.div>
   );
 }
 
-function Arm({
-  side, behavior, mood, skin, skinDark,
-}: {
-  side: "left" | "right"; behavior: Behavior; mood: Mood; skin: string; skinDark: string;
-}) {
-  const isLeft = side === "left";
-  const cx = isLeft ? 32 : 168;
-  const cy = 168;
-  const origin = `${isLeft ? 42 : 158}px 155px`;
-
-  let rotate: number | number[] = 0;
-  const dur = 0.9;
-  let repeat: number | undefined = Infinity;
-
-  if (behavior === "dance") {
-    rotate = isLeft ? [-30, 30, -30] : [30, -30, 30];
-  } else if (behavior === "jump" || mood === "excited") {
-    rotate = isLeft ? [-20, -60, -20] : [20, 60, 20];
-  } else if (behavior === "scratch") {
-    rotate = isLeft ? [-70, -55, -70] : 15;
-    if (!isLeft) repeat = undefined;
-  } else if (behavior === "stretch") {
-    rotate = isLeft ? -80 : 80;
-    repeat = undefined;
-  } else if (behavior === "walk-left" || behavior === "walk-right") {
-    rotate = isLeft ? [-8, 8, -8] : [8, -8, 8];
-  } else if (mood === "sad" || mood === "crying") {
-    rotate = isLeft ? 8 : -8;
-    repeat = undefined;
-  } else if (mood === "inlove") {
-    rotate = isLeft ? [-4, 6, -4] : [4, -6, 4];
-  }
-
-  return (
-    <motion.g
-      style={{ transformOrigin: origin }}
-      animate={{ rotate }}
-      transition={{ duration: dur, repeat, ease: "easeInOut" as const }}
-    >
-      <ellipse cx={cx} cy={cy} rx="12" ry="18" fill={skinDark} />
-      <circle cx={cx} cy={cy + 10} r="9" fill={skin} />
-    </motion.g>
-  );
+function eyesForcedClosed(mood: Mood, behavior: Behavior, isDead?: boolean): boolean {
+  if (isDead) return true;
+  if (mood === "sleep" || mood === "crying") return true;
+  if (behavior === "yawn") return true;
+  return false;
 }
-
-function Eye({
-  cx, cy, closed, heart, gazeX, gazeY,
-}: {
-  cx: number; cy: number; closed: boolean; heart: boolean;
-  gazeX: any; gazeY: any;
-}) {
-  if (heart) {
-    return (
-      <g transform={`translate(${cx - 10} ${cy - 10})`}>
-        <motion.path
-          d="M10 4 C7 -1 0 0 0 6 C0 12 10 18 10 18 C10 18 20 12 20 6 C20 0 13 -1 10 4Z"
-          fill="#ff4d7d"
-          animate={{ scale: [1, 1.15, 1] }}
-          transition={{ duration: 1, repeat: Infinity }}
-          style={{ transformOrigin: "10px 10px" }}
-        />
-      </g>
-    );
-  }
-  if (closed) {
-    return (
-      <path
-        d={`M${cx - 10} ${cy} Q${cx} ${cy + 6} ${cx + 10} ${cy}`}
-        stroke="#3a2530"
-        strokeWidth="3"
-        strokeLinecap="round"
-        fill="none"
-      />
-    );
-  }
-  return (
-    <g>
-      <ellipse cx={cx} cy={cy} rx="11" ry="13" fill="#ffffff" />
-      <motion.g style={{ x: gazeX, y: gazeY }}>
-        <circle cx={cx} cy={cy + 1} r="7" fill="#2a1a2a" />
-        <circle cx={cx + 2} cy={cy - 2} r="2.4" fill="#ffffff" />
-        <circle cx={cx - 3} cy={cy + 4} r="1.2" fill="#ffffff" opacity="0.7" />
-      </motion.g>
-    </g>
-  );
-}
-
-/* ============================================================ */
-/*                     MOUTH SHAPES + BEHAVIOR                  */
-/* ============================================================ */
 
 const FACE_EMOJI: Record<string, string | null> = {
   idle: null,
@@ -558,37 +479,6 @@ const FACE_EMOJI: Record<string, string | null> = {
   cold: "🥶", hot: "🥵",
   critical: "😵",
 };
-
-function mouthForMood(mood: Mood, behavior: Behavior): string {
-  if (behavior === "yawn") return "M85 165 Q100 195 115 165 Q100 178 85 165Z";
-  switch (mood) {
-    case "happy":
-    case "play":
-    case "excited":
-    case "inlove":
-      return "M84 165 Q100 188 116 165 Q100 178 84 165Z";
-    case "sad":
-    case "crying":
-      return "M84 178 Q100 162 116 178";
-    case "sick":
-      return "M86 172 Q100 178 114 168";
-    case "angry":
-      return "M84 175 L116 172";
-    case "scared":
-      return "M92 170 Q100 178 108 170 Q100 174 92 170Z";
-    case "tired":
-    case "sleep":
-      return "M92 170 Q100 176 108 170";
-    case "cold":
-      return "M90 172 Q95 176 100 172 Q105 176 110 172";
-    case "hot":
-      return "M86 168 Q100 182 114 168 Q100 176 86 168Z";
-    case "critical":
-      return "M86 175 Q100 170 114 175";
-    default:
-      return "M90 168 Q100 175 110 168";
-  }
-}
 
 function behaviorDuration(b: Behavior): number {
   switch (b) {
