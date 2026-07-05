@@ -160,7 +160,7 @@ export function Pet({ mood, stage, reaction, hat, floaters, onTap, isDead, isCri
               initial={{ opacity: 0, y: 0, scale: 0.6 }}
               animate={{ opacity: [0, 1, 1, 0], y: -120, scale: [0.6, 1.3, 1] }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 1.3, ease: "easeOut" }}
+              transition={{ duration: 1.3, ease: "easeOut" as const }}
               className="absolute text-3xl"
               style={{ left: `${f.x}%`, top: "24%" }}
             >
@@ -188,7 +188,7 @@ export function Pet({ mood, stage, reaction, hat, floaters, onTap, isDead, isCri
       <motion.div
         className="floor-shadow h-5 w-40 -mt-1"
         animate={{ scaleX: behavior === "jump" ? [1, 0.6, 1] : [1, 0.9, 1] }}
-        transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" as const }}
       />
     </div>
   );
@@ -474,7 +474,7 @@ function PetBody({ size, mood, behavior, reaction, thought, hat, gazeX, gazeY, o
           <motion.span
             aria-hidden
             animate={{ rotate: [-6, 6, -6] }}
-            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" as const }}
             className="absolute left-1/2 -translate-x-1/2 text-5xl drop-shadow-[0_4px_6px_rgba(0,0,0,0.2)]"
             style={{ top: "-6%" }}
           >
@@ -513,7 +513,7 @@ function Ear({
     <motion.g
       style={{ transformOrigin: origin }}
       animate={{ rotate }}
-      transition={{ duration, repeat: Infinity, ease: "easeInOut" }}
+      transition={{ duration, repeat: Infinity, ease: "easeInOut" as const }}
     >
       <ellipse cx={cx} cy={cy} rx="18" ry="30" fill={skin} />
       <ellipse cx={cx} cy={cy + 4} rx="9" ry="20" fill="url(#earInner)" />
@@ -558,7 +558,7 @@ function Arm({
     <motion.g
       style={{ transformOrigin: origin }}
       animate={{ rotate }}
-      transition={{ duration: dur, repeat, ease: "easeInOut" }}
+      transition={{ duration: dur, repeat, ease: "easeInOut" as const }}
     >
       <ellipse cx={cx} cy={cy} rx="12" ry="18" fill={skinDark} />
       <circle cx={cx} cy={cy + 10} r="9" fill={skin} />
@@ -686,12 +686,12 @@ function buildContainerAnim(behavior: Behavior, isDead?: boolean) {
     case "walk-left":
       return {
         animate: { x: [-5, -70, -70, -70], y: [0, 0, 0, 0], rotate: 0 },
-        transition: { duration: 2.4, ease: "easeInOut" },
+        transition: { duration: 2.4, ease: "easeInOut" as const },
       };
     case "walk-right":
       return {
         animate: { x: [5, 70, 70, 70], rotate: 0 },
-        transition: { duration: 2.4, ease: "easeInOut" },
+        transition: { duration: 2.4, ease: "easeInOut" as const },
       };
     case "hide":
       return {
@@ -701,12 +701,12 @@ function buildContainerAnim(behavior: Behavior, isDead?: boolean) {
     case "spin":
       return {
         animate: { rotate: 360, x: 0, y: 0 },
-        transition: { duration: 1.2, ease: "easeInOut" },
+        transition: { duration: 1.2, ease: "easeInOut" as const },
       };
     default:
       return {
         animate: { x: 0, y: 0, rotate: 0, scale: 1, opacity: 1 },
-        transition: { duration: 0.6, ease: "easeOut" },
+        transition: { duration: 0.6, ease: "easeOut" as const },
       };
   }
 }
@@ -735,14 +735,14 @@ function buildBodyAnim(behavior: Behavior, mood: Mood, isDead?: boolean) {
 
   const base = {
     animate: { scaleY: breathScaleY, scaleX: breathScaleX, y: 0, rotate: 0 } as any,
-    transition: { duration: breathDur, repeat: Infinity, ease: "easeInOut" } as any,
+    transition: { duration: breathDur, repeat: Infinity, ease: "easeInOut" as const } as any,
   };
 
   switch (behavior) {
     case "jump":
       return {
         animate: { y: [0, -40, 0], scaleY: [1, 1.05, 0.9, 1.02, 1], scaleX: [1, 0.95, 1.05, 0.98, 1], rotate: [0, -4, 0] },
-        transition: { duration: 0.9, ease: "easeOut" },
+        transition: { duration: 0.9, ease: "easeOut" as const },
       };
     case "sit":
       return {
@@ -757,7 +757,7 @@ function buildBodyAnim(behavior: Behavior, mood: Mood, isDead?: boolean) {
     case "dance":
       return {
         animate: { rotate: [-8, 8, -8, 8, 0], y: [0, -10, 0, -10, 0], scaleY: [1, 1.05, 1, 1.05, 1] },
-        transition: { duration: 1.2, ease: "easeInOut" },
+        transition: { duration: 1.2, ease: "easeInOut" as const },
       };
     case "wobble":
       return {
@@ -772,7 +772,7 @@ function buildBodyAnim(behavior: Behavior, mood: Mood, isDead?: boolean) {
     case "head-tilt":
       return {
         animate: { rotate: [0, -10, -10, 0], scaleY: breathScaleY, scaleX: breathScaleX },
-        transition: { duration: 1.8, ease: "easeInOut" },
+        transition: { duration: 1.8, ease: "easeInOut" as const },
       };
     case "yawn":
       return {
@@ -783,7 +783,7 @@ function buildBodyAnim(behavior: Behavior, mood: Mood, isDead?: boolean) {
     case "walk-right":
       return {
         animate: { y: [0, -5, 0, -5, 0], scaleY: [1, 1.03, 1, 1.03, 1], rotate: 0 },
-        transition: { duration: 0.6, repeat: Infinity, ease: "easeInOut" },
+        transition: { duration: 0.6, repeat: Infinity, ease: "easeInOut" as const },
       };
     default:
       return base;
@@ -806,7 +806,7 @@ function AmbientEffect({ mood, isDead }: { mood: Mood; isDead?: boolean }) {
             style={{ left: `${20 + i * 12}%`, bottom: "10%" }}
             initial={{ opacity: 0, y: 20, scale: 0.6 }}
             animate={{ opacity: [0, 1, 0], y: -160, scale: [0.6, 1.2, 1] }}
-            transition={{ duration: 4, repeat: Infinity, delay: i * 0.6, ease: "easeOut" }}
+            transition={{ duration: 4, repeat: Infinity, delay: i * 0.6, ease: "easeOut" as const }}
           >
             💗
           </motion.span>
