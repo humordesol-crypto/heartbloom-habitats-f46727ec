@@ -258,6 +258,11 @@ function HomeScreen() {
         equipHat={equipHat}
         setWallpaper={setWallpaper}
       />
+      <MemorialScreen
+        open={state.isDead}
+        memorial={state.memorial}
+        onNewPet={startNewPet}
+      />
     </div>
   );
 }
@@ -268,8 +273,18 @@ function moodLabel(mood: string): string {
       idle: "Tranquilo",
       happy: "Feliz",
       play: "Animado",
+      excited: "Empolgado",
+      inlove: "Apaixonado",
       sleep: "Dormindo",
+      tired: "Cansado",
       sad: "Triste",
+      crying: "Chorando",
+      sick: "Doente",
+      angry: "Bravo",
+      scared: "Assustado",
+      cold: "Com frio",
+      hot: "Com calor",
+      critical: "Crítico",
     } as Record<string, string>
   )[mood] ?? mood;
 }
