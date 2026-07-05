@@ -79,7 +79,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" },
-      { title: "Momo — Pet virtual mágico" },
+      { title: "Momo — Seu pet virtual mágico" },
       {
         name: "description",
         content: "Um Tamagotchi reinventado para 2026. Cuide do seu pet virtual fofo, com emoções reais e personalidade única.",
@@ -88,6 +88,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-status-bar-style", content: "default" },
       { name: "apple-mobile-web-app-title", content: "Momo" },
+      { property: "og:title", content: "Momo — Seu pet virtual mágico" },
+      { name: "twitter:title", content: "Momo — Seu pet virtual mágico" },
+      { name: "description", content: "Cuide do seu pet virtual moderno. Alimente, brinque, dê carinho e veja sua personalidade evoluir." },
+      { property: "og:description", content: "Cuide do seu pet virtual moderno. Alimente, brinque, dê carinho e veja sua personalidade evoluir." },
+      { name: "twitter:description", content: "Cuide do seu pet virtual moderno. Alimente, brinque, dê carinho e veja sua personalidade evoluir." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/2d2eb64b-1364-491f-b8b2-c2163b9e2c02/id-preview-783bae40--122d56c6-909b-4b46-aece-7bfef6794bbb.lovable.app-1783272800618.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/2d2eb64b-1364-491f-b8b2-c2163b9e2c02/id-preview-783bae40--122d56c6-909b-4b46-aece-7bfef6794bbb.lovable.app-1783272800618.png" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:type", content: "website" },
     ],
     links: [
       {
