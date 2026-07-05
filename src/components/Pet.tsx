@@ -79,7 +79,7 @@ export function Pet({ mood, floaters, onTap }: Props) {
               scale: { type: "spring", stiffness: 180, damping: 14 },
               y: { duration: bobDuration, repeat: Infinity, ease: "easeInOut" },
             }}
-            className="h-64 w-64 object-contain [mix-blend-mode:multiply]"
+            className="h-64 w-64 object-contain drop-shadow-[0_18px_25px_rgba(180,80,140,0.25)]"
             draggable={false}
           />
         </AnimatePresence>
