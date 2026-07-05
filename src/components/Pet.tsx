@@ -1,6 +1,7 @@
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "motion/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Mood, Reaction, Stage } from "@/lib/pet-store";
+import momoAsset from "@/assets/momo-pet.png.asset.json";
 
 const HAT_EMOJI: Record<string, string> = {
   "hat-crown": "👑",
