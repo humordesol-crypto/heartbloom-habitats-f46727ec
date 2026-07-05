@@ -108,7 +108,7 @@ const DEFAULT_STATE: PetState = {
 };
 
 export const SHOP_ITEMS: ShopItem[] = [
-  { id: "apple",    name: "Maçã",       emoji: "🍎", price: 8,  kind: "food",     effect: { hunger: +20, energy: +3, healthy: 0 as never }, xp: 3 },
+  { id: "apple",    name: "Maçã",       emoji: "🍎", price: 8,  kind: "food",     effect: { hunger: +20, energy: +3 }, xp: 3 },
   { id: "cake",     name: "Bolo",       emoji: "🍰", price: 20, kind: "food",     effect: { hunger: +45, fun: +10 },   xp: 6 },
   { id: "sushi",    name: "Sushi",      emoji: "🍣", price: 30, kind: "food",     effect: { hunger: +60, love: +5 },   xp: 8 },
   { id: "juice",    name: "Suco",       emoji: "🧃", price: 10, kind: "drink",    effect: { thirst: +40, energy: +5 }, xp: 3 },
