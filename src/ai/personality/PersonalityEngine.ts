@@ -20,9 +20,7 @@ export class PersonalityEngine implements Serializable {
   // small drift over time
   update(now = Date.now()) {
     // intentionally tiny, kept deterministic-free
-    Object.keys(this.traits).forEach((k) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const key = k as any;
+    (Object.keys(this.traits) as (keyof PersonalityTraits)[]).forEach((key) => {
       const delta = (Math.random() - 0.5) * 0.02;
       this.traits[key] = Math.max(0, Math.min(100, this.traits[key] + delta));
     });
