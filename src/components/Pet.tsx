@@ -1,6 +1,7 @@
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "motion/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Mood, Reaction, Stage } from "@/lib/pet-store";
+import momoAsset from "@/assets/momo-pet.png.asset.json";
 
 const HAT_EMOJI: Record<string, string> = {
   "hat-crown": "👑",
@@ -237,36 +238,7 @@ function PetBody({ size, mood, behavior, reaction, thought, hat, gazeX, gazeY, o
     return () => { cancelled = true; clearTimeout(t); };
   }, [isDead]);
 
-  const eyesClosed =
-    isDead ||
-    mood === "sleep" ||
-    mood === "crying" ||
-    behavior === "yawn" ||
-    (mood === "inlove" && Math.random() < 0) || // handled with heart-eyes below
-    blink;
-
-  const heartEyes = mood === "inlove";
-  const angryBrows = mood === "angry";
-  const worriedBrows = mood === "scared" || mood === "sick";
-
-  const mouthPath = mouthForMood(mood, behavior);
-  const cheekBlush = mood === "inlove" || mood === "happy" || mood === "excited" || mood === "hot";
-  const skin = mood === "sick" ? "#c8d9c0" : mood === "cold" ? "#c8d6e6" : mood === "hot" ? "#f6b6b8" : "#f7c9d7";
-  const skinDark = mood === "sick" ? "#a3b699" : mood === "cold" ? "#9db4c6" : mood === "hot" ? "#e08f95" : "#e79fb6";
-
-  // Tail wag speed by mood
-  const tailWagSpeed =
-    mood === "play" || mood === "excited" ? 0.35 :
-    mood === "happy" || mood === "inlove" ? 0.6 :
-    mood === "sad" || mood === "sick" || mood === "crying" ? 2.5 :
-    isDead ? 0 : 1.4;
-
-  // Ear angles for emotion
-  const earBase =
-    mood === "sad" || mood === "crying" || mood === "sick" ? 20 :
-    mood === "scared" ? 35 :
-    mood === "angry" ? -25 :
-    mood === "inlove" || mood === "happy" ? -5 : 0;
+  // Kept for helpers below (unused vars intentionally omitted)
 
   return (
     <motion.button
@@ -316,158 +288,123 @@ function PetBody({ size, mood, behavior, reaction, thought, hat, gazeX, gazeY, o
         style={{ transformOrigin: "50% 90%" }}
         className="relative w-full h-full"
       >
-        <svg
-          viewBox="0 0 200 240"
-          className="w-full h-full drop-shadow-[0_18px_25px_rgba(180,80,140,0.28)]"
-        >
-          <defs>
-            <radialGradient id="bodyGrad" cx="45%" cy="35%" r="70%">
-              <stop offset="0%" stopColor="#ffffff" />
-              <stop offset="40%" stopColor={skin} />
-              <stop offset="100%" stopColor={skinDark} />
-            </radialGradient>
-            <radialGradient id="cheekGrad" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor="#ff8fb0" stopOpacity="0.9" />
-              <stop offset="100%" stopColor="#ff8fb0" stopOpacity="0" />
-            </radialGradient>
-            <linearGradient id="earInner" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#ffd3e0" />
-              <stop offset="100%" stopColor="#f2a9c2" />
-            </linearGradient>
-          </defs>
-
-          {/* Tail (behind body) */}
-          <motion.g
-            style={{ transformOrigin: "155px 175px" }}
-            animate={
-              isDead
-                ? { rotate: 0 }
-                : mood === "sad" || mood === "sick" || mood === "crying"
-                ? { rotate: [0, -3, 0] }
-                : { rotate: [-15, 25, -15] }
-            }
-            transition={{
-              duration: tailWagSpeed || 0.001,
-              repeat: Infinity,
-              ease: "easeInOut",
+        <div className="relative w-full h-full">
+          {/* Character bitmap */}
+          <img
+            src={momoAsset.url}
+            alt="Momo"
+            draggable={false}
+            className={`select-none pointer-events-none w-full h-full object-contain transition-[filter] duration-500 ${
+              isDead ? "grayscale opacity-70" :
+              mood === "sick" ? "saturate-[0.6] brightness-95" :
+              mood === "cold" ? "hue-rotate-[190deg] saturate-[0.8]" :
+              mood === "hot" ? "hue-rotate-[-15deg] saturate-125 brightness-[1.05]" :
+              mood === "critical" ? "grayscale-[0.4] brightness-90" : ""
+            }`}
+            style={{
+              filter:
+                mood === "inlove"
+                  ? "drop-shadow(0 0 22px rgba(255,90,140,0.55))"
+                  : mood === "excited" || mood === "play"
+                  ? "drop-shadow(0 12px 20px rgba(180,80,140,0.35))"
+                  : "drop-shadow(0 14px 22px rgba(180,80,140,0.3))",
             }}
-          >
-            <path
-              d="M155 175 Q185 165 190 195 Q195 220 175 215"
-              fill="none"
-              stroke={skinDark}
-              strokeWidth="14"
-              strokeLinecap="round"
-            />
-            <circle cx="178" cy="212" r="10" fill={skin} />
-          </motion.g>
-
-          {/* Feet */}
-          <motion.g
-            animate={
-              behavior === "walk-left" || behavior === "walk-right"
-                ? { y: [0, -4, 0, -4, 0] }
-                : behavior === "dance"
-                ? { y: [0, -6, 0, -6, 0] }
-                : { y: 0 }
-            }
-            transition={{ duration: 0.6, repeat: Infinity }}
-          >
-            <ellipse cx="78" cy="222" rx="16" ry="8" fill={skinDark} />
-            <ellipse cx="122" cy="222" rx="16" ry="8" fill={skinDark} />
-          </motion.g>
-
-          {/* Left ear */}
-          <Ear side="left" mood={mood} behavior={behavior} baseAngle={earBase} skin={skin} />
-          {/* Right ear */}
-          <Ear side="right" mood={mood} behavior={behavior} baseAngle={-earBase} skin={skin} />
-
-          {/* Body */}
-          <ellipse cx="100" cy="150" rx="72" ry="70" fill="url(#bodyGrad)" />
-          {/* Belly highlight */}
-          <ellipse cx="100" cy="175" rx="45" ry="30" fill="#ffffff" opacity="0.35" />
-
-          {/* Arms */}
-          <Arm side="left" behavior={behavior} mood={mood} skin={skin} skinDark={skinDark} />
-          <Arm side="right" behavior={behavior} mood={mood} skin={skin} skinDark={skinDark} />
-
-          {/* Cheeks */}
-          {cheekBlush && (
-            <>
-              <ellipse cx="60" cy="150" rx="14" ry="9" fill="url(#cheekGrad)" />
-              <ellipse cx="140" cy="150" rx="14" ry="9" fill="url(#cheekGrad)" />
-            </>
-          )}
-
-          {/* Brows */}
-          {angryBrows && (
-            <>
-              <line x1="66" y1="110" x2="86" y2="118" stroke="#3a2530" strokeWidth="4" strokeLinecap="round" />
-              <line x1="134" y1="118" x2="114" y2="110" stroke="#3a2530" strokeWidth="4" strokeLinecap="round" />
-            </>
-          )}
-          {worriedBrows && (
-            <>
-              <path d="M66 118 Q76 112 88 118" stroke="#3a2530" strokeWidth="3" strokeLinecap="round" fill="none" />
-              <path d="M112 118 Q124 112 134 118" stroke="#3a2530" strokeWidth="3" strokeLinecap="round" fill="none" />
-            </>
-          )}
-
-          {/* Eyes */}
-          <Eye
-            cx={78} cy={135} closed={eyesClosed} heart={heartEyes}
-            gazeX={gazeX} gazeY={gazeY}
-          />
-          <Eye
-            cx={122} cy={135} closed={eyesClosed} heart={heartEyes}
-            gazeX={gazeX} gazeY={gazeY}
           />
 
-          {/* Mouth */}
-          <motion.g
-            animate={{ scale: behavior === "yawn" ? [1, 1.6, 1] : 1 }}
-            transition={{ duration: 1.2 }}
-            style={{ transformOrigin: "100px 168px" }}
-          >
-            <path
-              d={mouthPath}
-              fill={mood === "angry" ? "#4a2030" : mood === "sick" ? "#7a5a5a" : "#5c2a3d"}
-              stroke="#5c2a3d"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            {/* Tongue for happy/yum */}
-            {(behavior === "yawn" || mood === "excited") && (
-              <ellipse cx="100" cy="175" rx="8" ry="4" fill="#ff7a99" />
-            )}
-          </motion.g>
+          {/* Eyelid overlays for real blinking, positioned over the eyes */}
+          <Eyelid side="left" closed={blink || eyesForcedClosed(mood, behavior, isDead)} />
+          <Eyelid side="right" closed={blink || eyesForcedClosed(mood, behavior, isDead)} />
 
-          {/* Special: teardrops when crying */}
-          {mood === "crying" && !isDead && (
+          {/* Heart-eyes overlay when in love */}
+          {mood === "inlove" && !isDead && (
             <>
-              <motion.circle
-                cx="78" cy="150" r="3.5" fill="#7ecff5"
-                animate={{ y: [0, 30], opacity: [1, 0] }}
-                transition={{ duration: 1.4, repeat: Infinity }}
+              <HeartEye side="left" />
+              <HeartEye side="right" />
+            </>
+          )}
+
+          {/* Angry brows */}
+          {mood === "angry" && !isDead && (
+            <>
+              <div
+                className="absolute bg-[#3a2530] rounded"
+                style={{ left: "36%", top: "37%", width: "10%", height: "3px", transform: "rotate(15deg)" }}
               />
-              <motion.circle
-                cx="122" cy="150" r="3.5" fill="#7ecff5"
-                animate={{ y: [0, 30], opacity: [1, 0] }}
-                transition={{ duration: 1.4, repeat: Infinity, delay: 0.6 }}
+              <div
+                className="absolute bg-[#3a2530] rounded"
+                style={{ left: "54%", top: "37%", width: "10%", height: "3px", transform: "rotate(-15deg)" }}
+              />
+            </>
+          )}
+
+          {/* Cheeks blush */}
+          {(mood === "inlove" || mood === "happy" || mood === "excited" || mood === "hot") && !isDead && (
+            <>
+              <div
+                className="absolute rounded-full bg-[#ff88a8] opacity-60 blur-[6px]"
+                style={{ left: "27%", top: "50%", width: "10%", height: "6%" }}
+              />
+              <div
+                className="absolute rounded-full bg-[#ff88a8] opacity-60 blur-[6px]"
+                style={{ left: "63%", top: "50%", width: "10%", height: "6%" }}
+              />
+            </>
+          )}
+
+          {/* Tears */}
+          {(mood === "crying" || mood === "sad") && !isDead && (
+            <>
+              <motion.div
+                className="absolute rounded-full bg-[#7ecff5]"
+                style={{ left: "40%", top: "47%", width: "3%", height: "4%" }}
+                animate={{ y: [0, 60, 60], opacity: [1, 1, 0] }}
+                transition={{ duration: 1.6, repeat: Infinity, ease: "easeIn" as const }}
+              />
+              <motion.div
+                className="absolute rounded-full bg-[#7ecff5]"
+                style={{ left: "57%", top: "47%", width: "3%", height: "4%" }}
+                animate={{ y: [0, 60, 60], opacity: [1, 1, 0] }}
+                transition={{ duration: 1.6, repeat: Infinity, delay: 0.5, ease: "easeIn" as const }}
               />
             </>
           )}
 
           {/* Sick sweat */}
           {mood === "sick" && !isDead && (
-            <motion.circle
-              cx="145" cy="115" r="3" fill="#a8d8ff"
-              animate={{ y: [0, 18], opacity: [1, 0] }}
+            <motion.span
+              className="absolute text-2xl"
+              style={{ left: "68%", top: "30%" }}
+              animate={{ y: [0, 12], opacity: [1, 0] }}
               transition={{ duration: 1.8, repeat: Infinity }}
-            />
+            >
+              💧
+            </motion.span>
           )}
-        </svg>
+
+          {/* Cold snowflake */}
+          {mood === "cold" && !isDead && (
+            <motion.span
+              className="absolute text-2xl"
+              style={{ left: "70%", top: "28%" }}
+              animate={{ rotate: [0, 360] }}
+              transition={{ duration: 4, repeat: Infinity, ease: "linear" as const }}
+            >
+              ❄️
+            </motion.span>
+          )}
+
+          {/* Hot sweat */}
+          {mood === "hot" && !isDead && (
+            <motion.span
+              className="absolute text-2xl"
+              style={{ left: "68%", top: "28%" }}
+              animate={{ y: [0, 14], opacity: [1, 0] }}
+              transition={{ duration: 1.4, repeat: Infinity }}
+            >
+              💦
+            </motion.span>
+          )}
+        </div>
 
         {/* Hat overlay */}
         {hat && HAT_EMOJI[hat] && !isDead && (
@@ -490,127 +427,48 @@ function PetBody({ size, mood, behavior, reaction, thought, hat, gazeX, gazeY, o
 /*                          BODY PARTS                          */
 /* ============================================================ */
 
-function Ear({
-  side, mood, behavior, baseAngle, skin,
-}: {
-  side: "left" | "right"; mood: Mood; behavior: Behavior; baseAngle: number; skin: string;
-}) {
-  const isLeft = side === "left";
-  const cx = isLeft ? 62 : 138;
-  const cy = 85;
-  const origin = `${cx}px ${cy + 15}px`;
-  const rotate =
-    behavior === "ear-wiggle"
-      ? [baseAngle, baseAngle + (isLeft ? 20 : -20), baseAngle - 5, baseAngle]
-      : behavior === "walk-left" || behavior === "walk-right"
-      ? [baseAngle - 4, baseAngle + 4, baseAngle - 4]
-      : mood === "scared"
-      ? [baseAngle, baseAngle + 2, baseAngle]
-      : [baseAngle, baseAngle + (isLeft ? -3 : 3), baseAngle];
-  const duration = behavior === "ear-wiggle" ? 0.9 : 3.6;
-
+/* Eyelid overlay (matches the pink eye ring; scales down to blink) */
+function Eyelid({ side, closed }: { side: "left" | "right"; closed: boolean }) {
+  const left = side === "left" ? "34%" : "52%";
   return (
-    <motion.g
-      style={{ transformOrigin: origin }}
-      animate={{ rotate }}
-      transition={{ duration, repeat: Infinity, ease: "easeInOut" as const }}
+    <motion.div
+      className="absolute rounded-[45%] pointer-events-none"
+      style={{
+        left,
+        top: "39.5%",
+        width: "14%",
+        height: "10%",
+        background: "linear-gradient(180deg, #f0a4b8, #e78ea6)",
+        transformOrigin: "50% 0%",
+        boxShadow: "inset 0 -2px 3px rgba(0,0,0,0.15)",
+      }}
+      animate={{ scaleY: closed ? 1 : 0 }}
+      transition={{ duration: 0.12, ease: "easeOut" as const }}
+    />
+  );
+}
+
+/* Big pink heart over each eye */
+function HeartEye({ side }: { side: "left" | "right" }) {
+  const left = side === "left" ? "35%" : "53%";
+  return (
+    <motion.div
+      className="absolute flex items-center justify-center pointer-events-none text-[46px] leading-none"
+      style={{ left, top: "38%", width: "12%", height: "10%", color: "#ff4d7d" }}
+      animate={{ scale: [1, 1.18, 1] }}
+      transition={{ duration: 0.9, repeat: Infinity, ease: "easeInOut" as const }}
     >
-      <ellipse cx={cx} cy={cy} rx="18" ry="30" fill={skin} />
-      <ellipse cx={cx} cy={cy + 4} rx="9" ry="20" fill="url(#earInner)" />
-    </motion.g>
+      ♥
+    </motion.div>
   );
 }
 
-function Arm({
-  side, behavior, mood, skin, skinDark,
-}: {
-  side: "left" | "right"; behavior: Behavior; mood: Mood; skin: string; skinDark: string;
-}) {
-  const isLeft = side === "left";
-  const cx = isLeft ? 32 : 168;
-  const cy = 168;
-  const origin = `${isLeft ? 42 : 158}px 155px`;
-
-  let rotate: number | number[] = 0;
-  const dur = 0.9;
-  let repeat: number | undefined = Infinity;
-
-  if (behavior === "dance") {
-    rotate = isLeft ? [-30, 30, -30] : [30, -30, 30];
-  } else if (behavior === "jump" || mood === "excited") {
-    rotate = isLeft ? [-20, -60, -20] : [20, 60, 20];
-  } else if (behavior === "scratch") {
-    rotate = isLeft ? [-70, -55, -70] : 15;
-    if (!isLeft) repeat = undefined;
-  } else if (behavior === "stretch") {
-    rotate = isLeft ? -80 : 80;
-    repeat = undefined;
-  } else if (behavior === "walk-left" || behavior === "walk-right") {
-    rotate = isLeft ? [-8, 8, -8] : [8, -8, 8];
-  } else if (mood === "sad" || mood === "crying") {
-    rotate = isLeft ? 8 : -8;
-    repeat = undefined;
-  } else if (mood === "inlove") {
-    rotate = isLeft ? [-4, 6, -4] : [4, -6, 4];
-  }
-
-  return (
-    <motion.g
-      style={{ transformOrigin: origin }}
-      animate={{ rotate }}
-      transition={{ duration: dur, repeat, ease: "easeInOut" as const }}
-    >
-      <ellipse cx={cx} cy={cy} rx="12" ry="18" fill={skinDark} />
-      <circle cx={cx} cy={cy + 10} r="9" fill={skin} />
-    </motion.g>
-  );
+function eyesForcedClosed(mood: Mood, behavior: Behavior, isDead?: boolean): boolean {
+  if (isDead) return true;
+  if (mood === "sleep" || mood === "crying") return true;
+  if (behavior === "yawn") return true;
+  return false;
 }
-
-function Eye({
-  cx, cy, closed, heart, gazeX, gazeY,
-}: {
-  cx: number; cy: number; closed: boolean; heart: boolean;
-  gazeX: any; gazeY: any;
-}) {
-  if (heart) {
-    return (
-      <g transform={`translate(${cx - 10} ${cy - 10})`}>
-        <motion.path
-          d="M10 4 C7 -1 0 0 0 6 C0 12 10 18 10 18 C10 18 20 12 20 6 C20 0 13 -1 10 4Z"
-          fill="#ff4d7d"
-          animate={{ scale: [1, 1.15, 1] }}
-          transition={{ duration: 1, repeat: Infinity }}
-          style={{ transformOrigin: "10px 10px" }}
-        />
-      </g>
-    );
-  }
-  if (closed) {
-    return (
-      <path
-        d={`M${cx - 10} ${cy} Q${cx} ${cy + 6} ${cx + 10} ${cy}`}
-        stroke="#3a2530"
-        strokeWidth="3"
-        strokeLinecap="round"
-        fill="none"
-      />
-    );
-  }
-  return (
-    <g>
-      <ellipse cx={cx} cy={cy} rx="11" ry="13" fill="#ffffff" />
-      <motion.g style={{ x: gazeX, y: gazeY }}>
-        <circle cx={cx} cy={cy + 1} r="7" fill="#2a1a2a" />
-        <circle cx={cx + 2} cy={cy - 2} r="2.4" fill="#ffffff" />
-        <circle cx={cx - 3} cy={cy + 4} r="1.2" fill="#ffffff" opacity="0.7" />
-      </motion.g>
-    </g>
-  );
-}
-
-/* ============================================================ */
-/*                     MOUTH SHAPES + BEHAVIOR                  */
-/* ============================================================ */
 
 const FACE_EMOJI: Record<string, string | null> = {
   idle: null,
@@ -621,37 +479,6 @@ const FACE_EMOJI: Record<string, string | null> = {
   cold: "🥶", hot: "🥵",
   critical: "😵",
 };
-
-function mouthForMood(mood: Mood, behavior: Behavior): string {
-  if (behavior === "yawn") return "M85 165 Q100 195 115 165 Q100 178 85 165Z";
-  switch (mood) {
-    case "happy":
-    case "play":
-    case "excited":
-    case "inlove":
-      return "M84 165 Q100 188 116 165 Q100 178 84 165Z";
-    case "sad":
-    case "crying":
-      return "M84 178 Q100 162 116 178";
-    case "sick":
-      return "M86 172 Q100 178 114 168";
-    case "angry":
-      return "M84 175 L116 172";
-    case "scared":
-      return "M92 170 Q100 178 108 170 Q100 174 92 170Z";
-    case "tired":
-    case "sleep":
-      return "M92 170 Q100 176 108 170";
-    case "cold":
-      return "M90 172 Q95 176 100 172 Q105 176 110 172";
-    case "hot":
-      return "M86 168 Q100 182 114 168 Q100 176 86 168Z";
-    case "critical":
-      return "M86 175 Q100 170 114 175";
-    default:
-      return "M90 168 Q100 175 110 168";
-  }
-}
 
 function behaviorDuration(b: Behavior): number {
   switch (b) {
