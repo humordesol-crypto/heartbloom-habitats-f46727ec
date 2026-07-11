@@ -310,9 +310,10 @@ interface BodyProps {
   pupilY: any;
   onTap: () => void;
   isDead?: boolean;
+  pal: PetPalette;
 }
 
-function RiggedBody({ size, mood, state, reaction, thought, hat, pupilX, pupilY, onTap, isDead }: BodyProps) {
+function RiggedBody({ size, mood, state, reaction, thought, hat, pupilX, pupilY, onTap, isDead, pal }: BodyProps) {
   // Real (short) blinking loop — independent of state machine
   const [blink, setBlink] = useState(false);
   useEffect(() => {
@@ -390,21 +391,21 @@ function RiggedBody({ size, mood, state, reaction, thought, hat, pupilX, pupilY,
       >
         <defs>
           <radialGradient id="bodyGrad" cx="40%" cy="35%" r="70%">
-            <stop offset="0%" stopColor="#ffd1e0" />
-            <stop offset="60%" stopColor="#ffa8c5" />
-            <stop offset="100%" stopColor="#ff88ae" />
+            <stop offset="0%" stopColor={pal.body[0]} />
+            <stop offset="60%" stopColor={pal.body[1]} />
+            <stop offset="100%" stopColor={pal.body[2]} />
           </radialGradient>
           <radialGradient id="bellyGrad" cx="50%" cy="45%" r="60%">
-            <stop offset="0%" stopColor="#fff2f6" />
-            <stop offset="100%" stopColor="#ffd3e0" />
+            <stop offset="0%" stopColor={pal.belly[0]} />
+            <stop offset="100%" stopColor={pal.belly[1]} />
           </radialGradient>
           <radialGradient id="eyeGrad" cx="35%" cy="35%" r="70%">
             <stop offset="0%" stopColor="#ffffff" />
             <stop offset="100%" stopColor="#f2f6ff" />
           </radialGradient>
           <linearGradient id="earGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#ffbcd2" />
-            <stop offset="100%" stopColor="#ff8fb1" />
+            <stop offset="0%" stopColor={pal.ear[0]} />
+            <stop offset="100%" stopColor={pal.ear[1]} />
           </linearGradient>
         </defs>
 
