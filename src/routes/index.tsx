@@ -15,11 +15,16 @@ import {
   Home,
   ShoppingBag,
   Shirt,
-  User,
+  BookOpen,
   HeartPulse,
   AlertTriangle,
 } from "lucide-react";
-import { usePet, personalityLabel, stageLabel } from "@/lib/pet-store";
+import {
+  usePet,
+  personalityLabel,
+  stageLabel,
+  evolutionName,
+} from "@/lib/pet-store";
 import { Pet } from "@/components/Pet";
 import { StatBar } from "@/components/StatBar";
 import { ActionButton } from "@/components/ActionButton";
@@ -27,20 +32,22 @@ import { ShopModal } from "@/components/ShopModal";
 import { MemoryGame } from "@/components/MemoryGame";
 import { WardrobeModal, wallpaperCSS } from "@/components/WardrobeModal";
 import { MemorialScreen } from "@/components/MemorialScreen";
+import { PokedexModal } from "@/components/PokedexModal";
+import { AnimatedBackground } from "@/components/AnimatedBackground";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Momo — Seu pet virtual mágico" },
+      { title: "Momo — Colecione e cuide de pets mágicos" },
       {
         name: "description",
         content:
-          "Cuide do seu pet virtual moderno. Alimente, brinque, dê carinho e veja sua personalidade evoluir.",
+          "Adote, evolua e colecione pets virtuais únicos. Cada criatura tem sua personalidade, evolução e precisa do seu cuidado diário.",
       },
-      { property: "og:title", content: "Momo — Seu pet virtual mágico" },
+      { property: "og:title", content: "Momo — Colecione e cuide de pets mágicos" },
       {
         property: "og:description",
-        content: "Um Tamagotchi reinventado para 2026. Fofo, imersivo e cheio de vida.",
+        content: "Um universo de pets colecionáveis com evolução, emoções e cuidado real.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
