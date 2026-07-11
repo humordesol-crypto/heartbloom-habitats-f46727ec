@@ -424,7 +424,7 @@ function RiggedBody({ size, mood, state, reaction, thought, hat, pupilX, pupilY,
             <path
               d="M295 250 Q345 210 355 175 Q360 165 350 162 Q335 158 320 180 Q305 210 290 240 Z"
               fill="url(#bodyGrad)"
-              stroke="#e56a92"
+              stroke={pal.stroke}
               strokeWidth="2"
             />
           </motion.g>
@@ -435,7 +435,7 @@ function RiggedBody({ size, mood, state, reaction, thought, hat, pupilX, pupilY,
             transition={{ duration: rig.legDur, repeat: rig.legRepeat, ease: "easeInOut" as const }}
             style={{ originX: "160px", originY: "320px", transformBox: "fill-box" as any }}
           >
-            <ellipse cx="160" cy="335" rx="26" ry="20" fill="url(#bodyGrad)" stroke="#e56a92" strokeWidth="2" />
+            <ellipse cx="160" cy="335" rx="26" ry="20" fill="url(#bodyGrad)" stroke={pal.stroke} strokeWidth="2" />
             <ellipse cx="160" cy="342" rx="18" ry="8" fill="#ff6f9a" opacity="0.55" />
           </motion.g>
           <motion.g
@@ -443,12 +443,12 @@ function RiggedBody({ size, mood, state, reaction, thought, hat, pupilX, pupilY,
             transition={{ duration: rig.legDur, repeat: rig.legRepeat, ease: "easeInOut" as const }}
             style={{ originX: "240px", originY: "320px", transformBox: "fill-box" as any }}
           >
-            <ellipse cx="240" cy="335" rx="26" ry="20" fill="url(#bodyGrad)" stroke="#e56a92" strokeWidth="2" />
+            <ellipse cx="240" cy="335" rx="26" ry="20" fill="url(#bodyGrad)" stroke={pal.stroke} strokeWidth="2" />
             <ellipse cx="240" cy="342" rx="18" ry="8" fill="#ff6f9a" opacity="0.55" />
           </motion.g>
 
           {/* ── BODY ── */}
-          <ellipse cx="200" cy="260" rx="95" ry="90" fill="url(#bodyGrad)" stroke="#e56a92" strokeWidth="2.5" />
+          <ellipse cx="200" cy="260" rx="95" ry="90" fill="url(#bodyGrad)" stroke={pal.stroke} strokeWidth="2.5" />
           <ellipse cx="200" cy="275" rx="60" ry="55" fill="url(#bellyGrad)" opacity="0.9" />
 
           {/* ── ARMS ── */}
@@ -458,7 +458,7 @@ function RiggedBody({ size, mood, state, reaction, thought, hat, pupilX, pupilY,
             style={{ originX: "115px", originY: "230px", transformBox: "fill-box" as any }}
           >
             <path d="M115 230 Q95 260 110 295 Q120 305 132 300 Q125 270 130 240 Z"
-              fill="url(#bodyGrad)" stroke="#e56a92" strokeWidth="2" />
+              fill="url(#bodyGrad)" stroke={pal.stroke} strokeWidth="2" />
           </motion.g>
           <motion.g
             animate={{ rotate: rig.armRightRot, y: rig.armRightY }}
@@ -466,7 +466,7 @@ function RiggedBody({ size, mood, state, reaction, thought, hat, pupilX, pupilY,
             style={{ originX: "285px", originY: "230px", transformBox: "fill-box" as any }}
           >
             <path d="M285 230 Q305 260 290 295 Q280 305 268 300 Q275 270 270 240 Z"
-              fill="url(#bodyGrad)" stroke="#e56a92" strokeWidth="2" />
+              fill="url(#bodyGrad)" stroke={pal.stroke} strokeWidth="2" />
           </motion.g>
 
           {/* ── HEAD (with ears, eyes, mouth) ── */}
@@ -482,7 +482,7 @@ function RiggedBody({ size, mood, state, reaction, thought, hat, pupilX, pupilY,
               style={{ originX: "135px", originY: "140px", transformBox: "fill-box" as any }}
             >
               <path d="M135 145 Q110 90 130 70 Q150 65 160 100 Q160 125 150 145 Z"
-                fill="url(#earGrad)" stroke="#e56a92" strokeWidth="2" />
+                fill="url(#earGrad)" stroke={pal.stroke} strokeWidth="2" />
               <path d="M138 130 Q130 105 140 90 Q150 92 152 115 Q150 130 145 138 Z"
                 fill="#ffd1de" opacity="0.8" />
             </motion.g>
@@ -493,13 +493,13 @@ function RiggedBody({ size, mood, state, reaction, thought, hat, pupilX, pupilY,
               style={{ originX: "265px", originY: "140px", transformBox: "fill-box" as any }}
             >
               <path d="M265 145 Q290 90 270 70 Q250 65 240 100 Q240 125 250 145 Z"
-                fill="url(#earGrad)" stroke="#e56a92" strokeWidth="2" />
+                fill="url(#earGrad)" stroke={pal.stroke} strokeWidth="2" />
               <path d="M262 130 Q270 105 260 90 Q250 92 248 115 Q250 130 255 138 Z"
                 fill="#ffd1de" opacity="0.8" />
             </motion.g>
 
             {/* Head shape */}
-            <ellipse cx="200" cy="170" rx="92" ry="80" fill="url(#bodyGrad)" stroke="#e56a92" strokeWidth="2.5" />
+            <ellipse cx="200" cy="170" rx="92" ry="80" fill="url(#bodyGrad)" stroke={pal.stroke} strokeWidth="2.5" />
 
             {/* Brows */}
             <motion.g animate={{ y: rig.browY, rotate: rig.browRot }} transition={blend}>
