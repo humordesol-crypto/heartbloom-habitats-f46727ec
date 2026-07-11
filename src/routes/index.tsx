@@ -57,11 +57,13 @@ export const Route = createFileRoute("/")({
   component: HomeScreen,
 });
 
-type Panel = "shop" | "game" | "wardrobe" | null;
+type Panel = "shop" | "game" | "wardrobe" | "pokedex" | null;
 
 function HomeScreen() {
   const {
     state,
+    game,
+    species,
     mood,
     stage,
     reaction,
@@ -76,6 +78,10 @@ function HomeScreen() {
     greeting,
     dismissGreeting,
     startNewPet,
+    hatchSpecies,
+    setActive,
+    releaseDead,
+    evolving,
   } = usePet();
   const [panel, setPanel] = useState<Panel>(null);
   const xpForLevel = state.level * 25;
@@ -83,17 +89,25 @@ function HomeScreen() {
 
   const wpBg = wallpaperCSS(state.wallpaper);
   const isDarkWp = state.wallpaper === "space";
+  const displayName = evolutionName(state.speciesId, stage);
 
   return (
-    <div className="min-h-[100dvh] mx-auto flex max-w-md flex-col overflow-hidden px-4 pt-[max(env(safe-area-inset-top),1rem)] pb-[max(env(safe-area-inset-bottom),1rem)]">
+    <>
+      <AnimatedBackground auraColor={species.palette.aura} />
+      <div className="min-h-[100dvh] mx-auto flex max-w-md flex-col overflow-hidden px-4 pt-[max(env(safe-area-inset-top),1rem)] pb-[max(env(safe-area-inset-bottom),1rem)]">
       {/* Header */}
       <header className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="relative grid place-items-center h-11 w-11 rounded-2xl bg-gradient-to-br from-primary to-[oklch(0.85_0.14_330)] shadow-soft">
-            <Sparkles className="h-5 w-5 text-white" />
+          <div
+            className="relative grid place-items-center h-11 w-11 rounded-2xl shadow-soft text-xl"
+            style={{
+              background: `linear-gradient(135deg, ${species.palette.body[0]}, ${species.palette.body[2]})`,
+            }}
+          >
+            {species.emoji}
           </div>
           <div>
-            <h1 className="text-lg leading-tight font-bold">{state.name}</h1>
+            <h1 className="text-lg leading-tight font-bold">{displayName}</h1>
             <p className="text-[11px] text-muted-foreground -mt-0.5">
               {stageLabel(stage)} · {personalityLabel(state.personality)} · Nv {state.level}
             </p>
