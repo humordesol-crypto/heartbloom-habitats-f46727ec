@@ -240,6 +240,7 @@ export function Pet({ mood, stage, reaction, hat, floaters, onTap, isDead, isCri
         pupilY={pupilY}
         onTap={onTap}
         isDead={isDead}
+        pal={pal}
       />
 
       <motion.div
@@ -247,6 +248,49 @@ export function Pet({ mood, stage, reaction, hat, floaters, onTap, isDead, isCri
         animate={{ scaleX: state === "jump" || state === "run" ? [1, 0.55, 1] : [1, 0.92, 1] }}
         transition={{ duration: state === "run" ? 0.35 : 1.6, repeat: Infinity, ease: "easeInOut" as const }}
       />
+
+      {/* Evolution flash overlay */}
+      <AnimatePresence>
+        {evolving && (
+          <motion.div
+            key="evo"
+            className="pointer-events-none absolute inset-0 flex items-center justify-center z-30"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="absolute h-72 w-72 rounded-full"
+              style={{ background: `radial-gradient(circle, white, ${pal.aura} 55%, transparent 75%)` }}
+              initial={{ scale: 0.2, opacity: 0.9 }}
+              animate={{ scale: [0.2, 1.6, 1.2, 2], opacity: [1, 1, 0.9, 0] }}
+              transition={{ duration: 2.2, ease: "easeOut" }}
+            />
+            {[...Array(12)].map((_, i) => (
+              <motion.span
+                key={i}
+                className="absolute h-2 w-2 rounded-full bg-white"
+                style={{ boxShadow: `0 0 12px ${pal.aura}` }}
+                initial={{ x: 0, y: 0, opacity: 1 }}
+                animate={{
+                  x: Math.cos((i / 12) * Math.PI * 2) * 160,
+                  y: Math.sin((i / 12) * Math.PI * 2) * 160,
+                  opacity: [1, 1, 0],
+                }}
+                transition={{ duration: 1.8, ease: "easeOut" }}
+              />
+            ))}
+            <motion.div
+              className="absolute text-4xl font-black tracking-wider text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.4)]"
+              initial={{ scale: 0.4, opacity: 0 }}
+              animate={{ scale: [0.4, 1.2, 1], opacity: [0, 1, 1, 0] }}
+              transition={{ duration: 2.2 }}
+            >
+              EVOLUINDO!
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
