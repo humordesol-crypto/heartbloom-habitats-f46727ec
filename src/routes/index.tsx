@@ -179,6 +179,8 @@ function HomeScreen() {
             onTap={() => doAction("pet", "💖")}
             isDead={state.isDead}
             isCritical={isCritical}
+            palette={species.palette}
+            evolving={evolving}
           />
         </div>
 
@@ -241,10 +243,10 @@ function HomeScreen() {
       <nav className="mt-3 flex items-center justify-around rounded-full glass-card px-2 py-2">
         {[
           { icon: Home, label: "Casa", onClick: () => setPanel(null), active: panel === null },
+          { icon: BookOpen, label: "Pokédex", onClick: () => setPanel("pokedex"), active: panel === "pokedex" },
           { icon: ShoppingBag, label: "Loja", onClick: () => setPanel("shop"), active: panel === "shop" },
           { icon: Gamepad2, label: "Jogos", onClick: () => setPanel("game"), active: panel === "game" },
           { icon: Shirt, label: "Estilo", onClick: () => setPanel("wardrobe"), active: panel === "wardrobe" },
-          { icon: User, label: "Perfil", onClick: () => {}, active: false },
         ].map(({ icon: Icon, label, onClick, active }) => (
           <button
             key={label}
@@ -279,12 +281,21 @@ function HomeScreen() {
         equipHat={equipHat}
         setWallpaper={setWallpaper}
       />
+      <PokedexModal
+        open={panel === "pokedex"}
+        onClose={() => setPanel(null)}
+        game={game}
+        hatchSpecies={hatchSpecies}
+        setActive={(id) => { setActive(id); setPanel(null); }}
+        releaseDead={releaseDead}
+      />
       <MemorialScreen
         open={state.isDead}
         memorial={state.memorial}
         onNewPet={startNewPet}
       />
-    </div>
+      </div>
+    </>
   );
 }
 
