@@ -7,6 +7,7 @@
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "motion/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Mood, Reaction, Stage } from "@/lib/pet-store";
+import type { PetPalette } from "@/lib/species";
 
 const HAT_EMOJI: Record<string, string> = {
   "hat-crown": "👑",
@@ -20,6 +21,14 @@ const REACTION_EMOJI: Record<Reaction, string> = {
   cold: "🥶", hot: "🥵", inlove: "😍", crying: "😭",
 };
 
+const DEFAULT_PALETTE: PetPalette = {
+  body: ["#ffd1e0", "#ffa8c5", "#ff88ae"],
+  belly: ["#fff2f6", "#ffd3e0"],
+  ear: ["#ffbcd2", "#ff8fb1"],
+  stroke: "#e56a92",
+  aura: "oklch(0.78 0.16 350)",
+};
+
 /* ─────────────────────────────────────────────────────────── */
 /*  STATE MACHINE                                              */
 /* ─────────────────────────────────────────────────────────── */
@@ -29,7 +38,6 @@ type PetState =
   | "walkLeft" | "walkRight" | "run" | "jump" | "dance" | "laugh"
   | "scared" | "angry" | "sick" | "stretch" | "blink" | "curious"
   | "thinking" | "love"
-  // micro
   | "yawn" | "scratchFace" | "scratchBelly" | "sit" | "standUp"
   | "trip" | "earWiggle" | "tailWag" | "lookLeft" | "lookRight" | "headTilt";
 
@@ -42,6 +50,8 @@ interface Props {
   onTap: () => void;
   isDead?: boolean;
   isCritical?: boolean;
+  palette?: PetPalette;
+  evolving?: boolean;
 }
 
 /** Behaviors this mood is allowed to randomly wander into. */
