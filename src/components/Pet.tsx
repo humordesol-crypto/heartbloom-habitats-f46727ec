@@ -112,7 +112,8 @@ function stateDuration(s: PetState): number {
 /*  COMPONENT                                                  */
 /* ─────────────────────────────────────────────────────────── */
 
-export function Pet({ mood, stage, reaction, hat, floaters, onTap, isDead, isCritical }: Props) {
+export function Pet({ mood, stage, reaction, hat, floaters, onTap, isDead, isCritical, palette, evolving }: Props) {
+  const pal = palette ?? DEFAULT_PALETTE;
   const size = stage === "baby" ? 240 : stage === "adult" ? 320 : 280;
 
   const [state, setState] = useState<PetState>("idle");
