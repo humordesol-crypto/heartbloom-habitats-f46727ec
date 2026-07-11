@@ -1,11 +1,11 @@
 import { Modal } from "./Modal";
-import { SHOP_ITEMS, type PetState } from "@/lib/pet-store";
+import { SHOP_ITEMS, type FlatPetState } from "@/lib/pet-store";
 import { Check, Lock } from "lucide-react";
 
 interface Props {
   open: boolean;
   onClose: () => void;
-  state: PetState;
+  state: FlatPetState;
   equipHat: (id: string | null) => void;
   setWallpaper: (id: string) => void;
 }

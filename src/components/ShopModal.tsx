@@ -2,12 +2,12 @@ import { useState } from "react";
 import { motion } from "motion/react";
 import { Coins, Check } from "lucide-react";
 import { Modal } from "./Modal";
-import { SHOP_ITEMS, type ShopItem, type PetState } from "@/lib/pet-store";
+import { SHOP_ITEMS, type ShopItem, type FlatPetState } from "@/lib/pet-store";
 
 interface Props {
   open: boolean;
   onClose: () => void;
-  state: PetState;
+  state: FlatPetState;
   buyItem: (item: ShopItem) => { ok: boolean; msg?: string };
   useItem: (item: ShopItem) => void;
 }

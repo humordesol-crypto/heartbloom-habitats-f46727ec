@@ -56,6 +56,14 @@ export interface PetState {
   temperatureUntil: number;
 }
 
+export interface FlatPetState extends PetState {
+  coins: number;
+  inventory: Record<string, number>;
+  wallpaper: string;
+  bestMemoryScore: number;
+  memorial: Memorial | null;
+}
+
 export interface GameState {
   activeId: string;
   pets: Record<string, PetState>;
