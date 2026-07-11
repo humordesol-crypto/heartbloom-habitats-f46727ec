@@ -15,11 +15,16 @@ import {
   Home,
   ShoppingBag,
   Shirt,
-  User,
+  BookOpen,
   HeartPulse,
   AlertTriangle,
 } from "lucide-react";
-import { usePet, personalityLabel, stageLabel } from "@/lib/pet-store";
+import {
+  usePet,
+  personalityLabel,
+  stageLabel,
+  evolutionName,
+} from "@/lib/pet-store";
 import { Pet } from "@/components/Pet";
 import { StatBar } from "@/components/StatBar";
 import { ActionButton } from "@/components/ActionButton";
@@ -27,20 +32,22 @@ import { ShopModal } from "@/components/ShopModal";
 import { MemoryGame } from "@/components/MemoryGame";
 import { WardrobeModal, wallpaperCSS } from "@/components/WardrobeModal";
 import { MemorialScreen } from "@/components/MemorialScreen";
+import { PokedexModal } from "@/components/PokedexModal";
+import { AnimatedBackground } from "@/components/AnimatedBackground";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Momo — Seu pet virtual mágico" },
+      { title: "Momo — Colecione e cuide de pets mágicos" },
       {
         name: "description",
         content:
-          "Cuide do seu pet virtual moderno. Alimente, brinque, dê carinho e veja sua personalidade evoluir.",
+          "Adote, evolua e colecione pets virtuais únicos. Cada criatura tem sua personalidade, evolução e precisa do seu cuidado diário.",
       },
-      { property: "og:title", content: "Momo — Seu pet virtual mágico" },
+      { property: "og:title", content: "Momo — Colecione e cuide de pets mágicos" },
       {
         property: "og:description",
-        content: "Um Tamagotchi reinventado para 2026. Fofo, imersivo e cheio de vida.",
+        content: "Um universo de pets colecionáveis com evolução, emoções e cuidado real.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -50,11 +57,13 @@ export const Route = createFileRoute("/")({
   component: HomeScreen,
 });
 
-type Panel = "shop" | "game" | "wardrobe" | null;
+type Panel = "shop" | "game" | "wardrobe" | "pokedex" | null;
 
 function HomeScreen() {
   const {
     state,
+    game,
+    species,
     mood,
     stage,
     reaction,
@@ -69,6 +78,10 @@ function HomeScreen() {
     greeting,
     dismissGreeting,
     startNewPet,
+    hatchSpecies,
+    setActive,
+    releaseDead,
+    evolving,
   } = usePet();
   const [panel, setPanel] = useState<Panel>(null);
   const xpForLevel = state.level * 25;
@@ -76,17 +89,25 @@ function HomeScreen() {
 
   const wpBg = wallpaperCSS(state.wallpaper);
   const isDarkWp = state.wallpaper === "space";
+  const displayName = evolutionName(state.speciesId, stage);
 
   return (
-    <div className="min-h-[100dvh] mx-auto flex max-w-md flex-col overflow-hidden px-4 pt-[max(env(safe-area-inset-top),1rem)] pb-[max(env(safe-area-inset-bottom),1rem)]">
+    <>
+      <AnimatedBackground auraColor={species.palette.aura} />
+      <div className="min-h-[100dvh] mx-auto flex max-w-md flex-col overflow-hidden px-4 pt-[max(env(safe-area-inset-top),1rem)] pb-[max(env(safe-area-inset-bottom),1rem)]">
       {/* Header */}
       <header className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="relative grid place-items-center h-11 w-11 rounded-2xl bg-gradient-to-br from-primary to-[oklch(0.85_0.14_330)] shadow-soft">
-            <Sparkles className="h-5 w-5 text-white" />
+          <div
+            className="relative grid place-items-center h-11 w-11 rounded-2xl shadow-soft text-xl"
+            style={{
+              background: `linear-gradient(135deg, ${species.palette.body[0]}, ${species.palette.body[2]})`,
+            }}
+          >
+            {species.emoji}
           </div>
           <div>
-            <h1 className="text-lg leading-tight font-bold">{state.name}</h1>
+            <h1 className="text-lg leading-tight font-bold">{displayName}</h1>
             <p className="text-[11px] text-muted-foreground -mt-0.5">
               {stageLabel(stage)} · {personalityLabel(state.personality)} · Nv {state.level}
             </p>
@@ -158,6 +179,8 @@ function HomeScreen() {
             onTap={() => doAction("pet", "💖")}
             isDead={state.isDead}
             isCritical={isCritical}
+            palette={species.palette}
+            evolving={evolving}
           />
         </div>
 
@@ -220,10 +243,10 @@ function HomeScreen() {
       <nav className="mt-3 flex items-center justify-around rounded-full glass-card px-2 py-2">
         {[
           { icon: Home, label: "Casa", onClick: () => setPanel(null), active: panel === null },
+          { icon: BookOpen, label: "Pokédex", onClick: () => setPanel("pokedex"), active: panel === "pokedex" },
           { icon: ShoppingBag, label: "Loja", onClick: () => setPanel("shop"), active: panel === "shop" },
           { icon: Gamepad2, label: "Jogos", onClick: () => setPanel("game"), active: panel === "game" },
           { icon: Shirt, label: "Estilo", onClick: () => setPanel("wardrobe"), active: panel === "wardrobe" },
-          { icon: User, label: "Perfil", onClick: () => {}, active: false },
         ].map(({ icon: Icon, label, onClick, active }) => (
           <button
             key={label}
@@ -258,12 +281,21 @@ function HomeScreen() {
         equipHat={equipHat}
         setWallpaper={setWallpaper}
       />
+      <PokedexModal
+        open={panel === "pokedex"}
+        onClose={() => setPanel(null)}
+        game={game}
+        hatchSpecies={hatchSpecies}
+        setActive={(id) => { setActive(id); setPanel(null); }}
+        releaseDead={releaseDead}
+      />
       <MemorialScreen
         open={state.isDead}
         memorial={state.memorial}
         onNewPet={startNewPet}
       />
-    </div>
+      </div>
+    </>
   );
 }
 

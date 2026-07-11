@@ -7,6 +7,7 @@
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "motion/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Mood, Reaction, Stage } from "@/lib/pet-store";
+import type { PetPalette } from "@/lib/species";
 
 const HAT_EMOJI: Record<string, string> = {
   "hat-crown": "👑",
@@ -20,6 +21,14 @@ const REACTION_EMOJI: Record<Reaction, string> = {
   cold: "🥶", hot: "🥵", inlove: "😍", crying: "😭",
 };
 
+const DEFAULT_PALETTE: PetPalette = {
+  body: ["#ffd1e0", "#ffa8c5", "#ff88ae"],
+  belly: ["#fff2f6", "#ffd3e0"],
+  ear: ["#ffbcd2", "#ff8fb1"],
+  stroke: "#e56a92",
+  aura: "oklch(0.78 0.16 350)",
+};
+
 /* ─────────────────────────────────────────────────────────── */
 /*  STATE MACHINE                                              */
 /* ─────────────────────────────────────────────────────────── */
@@ -29,7 +38,6 @@ type PetState =
   | "walkLeft" | "walkRight" | "run" | "jump" | "dance" | "laugh"
   | "scared" | "angry" | "sick" | "stretch" | "blink" | "curious"
   | "thinking" | "love"
-  // micro
   | "yawn" | "scratchFace" | "scratchBelly" | "sit" | "standUp"
   | "trip" | "earWiggle" | "tailWag" | "lookLeft" | "lookRight" | "headTilt";
 
@@ -42,6 +50,8 @@ interface Props {
   onTap: () => void;
   isDead?: boolean;
   isCritical?: boolean;
+  palette?: PetPalette;
+  evolving?: boolean;
 }
 
 /** Behaviors this mood is allowed to randomly wander into. */
@@ -102,7 +112,8 @@ function stateDuration(s: PetState): number {
 /*  COMPONENT                                                  */
 /* ─────────────────────────────────────────────────────────── */
 
-export function Pet({ mood, stage, reaction, hat, floaters, onTap, isDead, isCritical }: Props) {
+export function Pet({ mood, stage, reaction, hat, floaters, onTap, isDead, isCritical, palette, evolving }: Props) {
+  const pal = palette ?? DEFAULT_PALETTE;
   const size = stage === "baby" ? 240 : stage === "adult" ? 320 : 280;
 
   const [state, setState] = useState<PetState>("idle");
@@ -229,6 +240,7 @@ export function Pet({ mood, stage, reaction, hat, floaters, onTap, isDead, isCri
         pupilY={pupilY}
         onTap={onTap}
         isDead={isDead}
+        pal={pal}
       />
 
       <motion.div
@@ -236,6 +248,49 @@ export function Pet({ mood, stage, reaction, hat, floaters, onTap, isDead, isCri
         animate={{ scaleX: state === "jump" || state === "run" ? [1, 0.55, 1] : [1, 0.92, 1] }}
         transition={{ duration: state === "run" ? 0.35 : 1.6, repeat: Infinity, ease: "easeInOut" as const }}
       />
+
+      {/* Evolution flash overlay */}
+      <AnimatePresence>
+        {evolving && (
+          <motion.div
+            key="evo"
+            className="pointer-events-none absolute inset-0 flex items-center justify-center z-30"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="absolute h-72 w-72 rounded-full"
+              style={{ background: `radial-gradient(circle, white, ${pal.aura} 55%, transparent 75%)` }}
+              initial={{ scale: 0.2, opacity: 0.9 }}
+              animate={{ scale: [0.2, 1.6, 1.2, 2], opacity: [1, 1, 0.9, 0] }}
+              transition={{ duration: 2.2, ease: "easeOut" }}
+            />
+            {[...Array(12)].map((_, i) => (
+              <motion.span
+                key={i}
+                className="absolute h-2 w-2 rounded-full bg-white"
+                style={{ boxShadow: `0 0 12px ${pal.aura}` }}
+                initial={{ x: 0, y: 0, opacity: 1 }}
+                animate={{
+                  x: Math.cos((i / 12) * Math.PI * 2) * 160,
+                  y: Math.sin((i / 12) * Math.PI * 2) * 160,
+                  opacity: [1, 1, 0],
+                }}
+                transition={{ duration: 1.8, ease: "easeOut" }}
+              />
+            ))}
+            <motion.div
+              className="absolute text-4xl font-black tracking-wider text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.4)]"
+              initial={{ scale: 0.4, opacity: 0 }}
+              animate={{ scale: [0.4, 1.2, 1], opacity: [0, 1, 1, 0] }}
+              transition={{ duration: 2.2 }}
+            >
+              EVOLUINDO!
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -255,9 +310,10 @@ interface BodyProps {
   pupilY: any;
   onTap: () => void;
   isDead?: boolean;
+  pal: PetPalette;
 }
 
-function RiggedBody({ size, mood, state, reaction, thought, hat, pupilX, pupilY, onTap, isDead }: BodyProps) {
+function RiggedBody({ size, mood, state, reaction, thought, hat, pupilX, pupilY, onTap, isDead, pal }: BodyProps) {
   // Real (short) blinking loop — independent of state machine
   const [blink, setBlink] = useState(false);
   useEffect(() => {
@@ -335,21 +391,21 @@ function RiggedBody({ size, mood, state, reaction, thought, hat, pupilX, pupilY,
       >
         <defs>
           <radialGradient id="bodyGrad" cx="40%" cy="35%" r="70%">
-            <stop offset="0%" stopColor="#ffd1e0" />
-            <stop offset="60%" stopColor="#ffa8c5" />
-            <stop offset="100%" stopColor="#ff88ae" />
+            <stop offset="0%" stopColor={pal.body[0]} />
+            <stop offset="60%" stopColor={pal.body[1]} />
+            <stop offset="100%" stopColor={pal.body[2]} />
           </radialGradient>
           <radialGradient id="bellyGrad" cx="50%" cy="45%" r="60%">
-            <stop offset="0%" stopColor="#fff2f6" />
-            <stop offset="100%" stopColor="#ffd3e0" />
+            <stop offset="0%" stopColor={pal.belly[0]} />
+            <stop offset="100%" stopColor={pal.belly[1]} />
           </radialGradient>
           <radialGradient id="eyeGrad" cx="35%" cy="35%" r="70%">
             <stop offset="0%" stopColor="#ffffff" />
             <stop offset="100%" stopColor="#f2f6ff" />
           </radialGradient>
           <linearGradient id="earGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#ffbcd2" />
-            <stop offset="100%" stopColor="#ff8fb1" />
+            <stop offset="0%" stopColor={pal.ear[0]} />
+            <stop offset="100%" stopColor={pal.ear[1]} />
           </linearGradient>
         </defs>
 
@@ -368,7 +424,7 @@ function RiggedBody({ size, mood, state, reaction, thought, hat, pupilX, pupilY,
             <path
               d="M295 250 Q345 210 355 175 Q360 165 350 162 Q335 158 320 180 Q305 210 290 240 Z"
               fill="url(#bodyGrad)"
-              stroke="#e56a92"
+              stroke={pal.stroke}
               strokeWidth="2"
             />
           </motion.g>
@@ -379,7 +435,7 @@ function RiggedBody({ size, mood, state, reaction, thought, hat, pupilX, pupilY,
             transition={{ duration: rig.legDur, repeat: rig.legRepeat, ease: "easeInOut" as const }}
             style={{ originX: "160px", originY: "320px", transformBox: "fill-box" as any }}
           >
-            <ellipse cx="160" cy="335" rx="26" ry="20" fill="url(#bodyGrad)" stroke="#e56a92" strokeWidth="2" />
+            <ellipse cx="160" cy="335" rx="26" ry="20" fill="url(#bodyGrad)" stroke={pal.stroke} strokeWidth="2" />
             <ellipse cx="160" cy="342" rx="18" ry="8" fill="#ff6f9a" opacity="0.55" />
           </motion.g>
           <motion.g
@@ -387,12 +443,12 @@ function RiggedBody({ size, mood, state, reaction, thought, hat, pupilX, pupilY,
             transition={{ duration: rig.legDur, repeat: rig.legRepeat, ease: "easeInOut" as const }}
             style={{ originX: "240px", originY: "320px", transformBox: "fill-box" as any }}
           >
-            <ellipse cx="240" cy="335" rx="26" ry="20" fill="url(#bodyGrad)" stroke="#e56a92" strokeWidth="2" />
+            <ellipse cx="240" cy="335" rx="26" ry="20" fill="url(#bodyGrad)" stroke={pal.stroke} strokeWidth="2" />
             <ellipse cx="240" cy="342" rx="18" ry="8" fill="#ff6f9a" opacity="0.55" />
           </motion.g>
 
           {/* ── BODY ── */}
-          <ellipse cx="200" cy="260" rx="95" ry="90" fill="url(#bodyGrad)" stroke="#e56a92" strokeWidth="2.5" />
+          <ellipse cx="200" cy="260" rx="95" ry="90" fill="url(#bodyGrad)" stroke={pal.stroke} strokeWidth="2.5" />
           <ellipse cx="200" cy="275" rx="60" ry="55" fill="url(#bellyGrad)" opacity="0.9" />
 
           {/* ── ARMS ── */}
@@ -402,7 +458,7 @@ function RiggedBody({ size, mood, state, reaction, thought, hat, pupilX, pupilY,
             style={{ originX: "115px", originY: "230px", transformBox: "fill-box" as any }}
           >
             <path d="M115 230 Q95 260 110 295 Q120 305 132 300 Q125 270 130 240 Z"
-              fill="url(#bodyGrad)" stroke="#e56a92" strokeWidth="2" />
+              fill="url(#bodyGrad)" stroke={pal.stroke} strokeWidth="2" />
           </motion.g>
           <motion.g
             animate={{ rotate: rig.armRightRot, y: rig.armRightY }}
@@ -410,7 +466,7 @@ function RiggedBody({ size, mood, state, reaction, thought, hat, pupilX, pupilY,
             style={{ originX: "285px", originY: "230px", transformBox: "fill-box" as any }}
           >
             <path d="M285 230 Q305 260 290 295 Q280 305 268 300 Q275 270 270 240 Z"
-              fill="url(#bodyGrad)" stroke="#e56a92" strokeWidth="2" />
+              fill="url(#bodyGrad)" stroke={pal.stroke} strokeWidth="2" />
           </motion.g>
 
           {/* ── HEAD (with ears, eyes, mouth) ── */}
@@ -426,7 +482,7 @@ function RiggedBody({ size, mood, state, reaction, thought, hat, pupilX, pupilY,
               style={{ originX: "135px", originY: "140px", transformBox: "fill-box" as any }}
             >
               <path d="M135 145 Q110 90 130 70 Q150 65 160 100 Q160 125 150 145 Z"
-                fill="url(#earGrad)" stroke="#e56a92" strokeWidth="2" />
+                fill="url(#earGrad)" stroke={pal.stroke} strokeWidth="2" />
               <path d="M138 130 Q130 105 140 90 Q150 92 152 115 Q150 130 145 138 Z"
                 fill="#ffd1de" opacity="0.8" />
             </motion.g>
@@ -437,13 +493,13 @@ function RiggedBody({ size, mood, state, reaction, thought, hat, pupilX, pupilY,
               style={{ originX: "265px", originY: "140px", transformBox: "fill-box" as any }}
             >
               <path d="M265 145 Q290 90 270 70 Q250 65 240 100 Q240 125 250 145 Z"
-                fill="url(#earGrad)" stroke="#e56a92" strokeWidth="2" />
+                fill="url(#earGrad)" stroke={pal.stroke} strokeWidth="2" />
               <path d="M262 130 Q270 105 260 90 Q250 92 248 115 Q250 130 255 138 Z"
                 fill="#ffd1de" opacity="0.8" />
             </motion.g>
 
             {/* Head shape */}
-            <ellipse cx="200" cy="170" rx="92" ry="80" fill="url(#bodyGrad)" stroke="#e56a92" strokeWidth="2.5" />
+            <ellipse cx="200" cy="170" rx="92" ry="80" fill="url(#bodyGrad)" stroke={pal.stroke} strokeWidth="2.5" />
 
             {/* Brows */}
             <motion.g animate={{ y: rig.browY, rotate: rig.browRot }} transition={blend}>
