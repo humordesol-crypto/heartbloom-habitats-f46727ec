@@ -12,7 +12,6 @@ import {
   Environment,
   Float,
   Html,
-  MeshTransmissionMaterial,
   Outlines,
 } from "@react-three/drei";
 import * as THREE from "three";
