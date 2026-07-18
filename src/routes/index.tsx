@@ -21,13 +21,10 @@ import {
 } from "lucide-react";
 import {
   usePet,
-  personalityLabel,
   stageLabel,
   evolutionName,
 } from "@/lib/pet-store";
 import { Pet3D as Pet } from "@/components/Pet3D";
-import { StatBar } from "@/components/StatBar";
-import { ActionButton } from "@/components/ActionButton";
 import { ShopModal } from "@/components/ShopModal";
 import { MemoryGame } from "@/components/MemoryGame";
 import { WardrobeModal, wallpaperCSS } from "@/components/WardrobeModal";
