@@ -21,13 +21,10 @@ import {
 } from "lucide-react";
 import {
   usePet,
-  personalityLabel,
   stageLabel,
   evolutionName,
 } from "@/lib/pet-store";
 import { Pet3D as Pet } from "@/components/Pet3D";
-import { StatBar } from "@/components/StatBar";
-import { ActionButton } from "@/components/ActionButton";
 import { ShopModal } from "@/components/ShopModal";
 import { MemoryGame } from "@/components/MemoryGame";
 import { WardrobeModal, wallpaperCSS } from "@/components/WardrobeModal";
@@ -91,62 +88,23 @@ function HomeScreen() {
   const isDarkWp = state.wallpaper === "space";
   const displayName = evolutionName(state.speciesId, stage);
 
+  const miniStats = [
+    { icon: Cookie,     value: state.stats.hunger,  tone: "hunger"  as const, label: "Fome" },
+    { icon: Droplets,   value: state.stats.thirst,  tone: "thirst"  as const, label: "Sede" },
+    { icon: Zap,        value: state.stats.energy,  tone: "energy"  as const, label: "Energia" },
+    { icon: Sparkles,   value: state.stats.hygiene, tone: "hygiene" as const, label: "Higiene" },
+    { icon: Gamepad2,   value: state.stats.fun,     tone: "fun"     as const, label: "Diversão" },
+    { icon: Heart,      value: state.stats.love,    tone: "love"    as const, label: "Carinho" },
+    { icon: HeartPulse, value: state.stats.health,  tone: "love"    as const, label: "Saúde" },
+  ];
+
   return (
     <>
       <AnimatedBackground auraColor={species.palette.aura} />
-      <div className="min-h-[100dvh] mx-auto flex max-w-md flex-col overflow-hidden px-4 pt-[max(env(safe-area-inset-top),1rem)] pb-[max(env(safe-area-inset-bottom),1rem)]">
-      {/* Header */}
-      <header className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div
-            className="relative grid place-items-center h-11 w-11 rounded-2xl shadow-soft text-xl"
-            style={{
-              background: `linear-gradient(135deg, ${species.palette.body[0]}, ${species.palette.body[2]})`,
-            }}
-          >
-            {species.emoji}
-          </div>
-          <div>
-            <h1 className="text-lg leading-tight font-bold">{displayName}</h1>
-            <p className="text-[11px] text-muted-foreground -mt-0.5">
-              {stageLabel(stage)} · {personalityLabel(state.personality)} · Nv {state.level}
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center gap-1.5 rounded-full bg-white/80 backdrop-blur-md px-3 py-1.5 border border-white shadow-soft">
-          <Coins className="h-4 w-4 text-[oklch(0.78_0.16_80)]" />
-          <span className="text-sm font-bold">{state.coins}</span>
-        </div>
-      </header>
 
-      {/* XP bar */}
-      <div className="mt-3 h-1.5 rounded-full bg-white/70 overflow-hidden">
-        <motion.div
-          className="h-full rounded-full bg-gradient-to-r from-primary to-[oklch(0.82_0.16_50)]"
-          initial={false}
-          animate={{ width: `${xpPct}%` }}
-          transition={{ type: "spring", stiffness: 120, damping: 20 }}
-        />
-      </div>
-
-      {/* Stats */}
-      <section className="mt-4 grid grid-cols-2 gap-2">
-        <StatBar icon={Cookie} label="Fome" value={state.stats.hunger} tone="hunger" />
-        <StatBar icon={Droplets} label="Sede" value={state.stats.thirst} tone="thirst" />
-        <StatBar icon={Zap} label="Energia" value={state.stats.energy} tone="energy" />
-        <StatBar icon={Sparkles} label="Higiene" value={state.stats.hygiene} tone="hygiene" />
-        <StatBar icon={Gamepad2} label="Diversão" value={state.stats.fun} tone="fun" />
-        <StatBar icon={Heart} label="Carinho" value={state.stats.love} tone="love" />
-        <div className="col-span-2">
-          <StatBar icon={HeartPulse} label="Saúde" value={state.stats.health} tone="love" />
-        </div>
-      </section>
-
-      {/* Pet stage */}
-      <section
-        className={`relative mt-4 flex-1 min-h-[280px] rounded-[2rem] overflow-hidden border border-white/70 shadow-lift transition-colors ${
-          isCritical ? "ring-4 ring-destructive/40" : ""
-        }`}
+      {/* Full-screen pet stage (behind UI) */}
+      <div
+        className={`fixed inset-0 -z-0 overflow-hidden ${isCritical ? "" : ""}`}
         style={{ background: wpBg }}
       >
         <div className="pointer-events-none absolute inset-0">
@@ -156,7 +114,6 @@ function HomeScreen() {
           {state.wallpaper === "space" && <SpaceDecor />}
         </div>
 
-        {/* Critical overlay */}
         {isCritical && (
           <motion.div
             className="pointer-events-none absolute inset-0"
@@ -169,47 +126,101 @@ function HomeScreen() {
           />
         )}
 
-        <div className="relative h-full flex items-center justify-center pt-4">
-          <Pet
-            mood={mood}
-            stage={stage}
-            reaction={reaction}
-            hat={state.equippedHat}
-            floaters={floaters}
-            onTap={() => doAction("pet", "💖")}
-            isDead={state.isDead}
-            isCritical={isCritical}
-            palette={species.palette}
-            evolving={evolving}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="w-full h-full max-w-[720px]">
+            <Pet
+              mood={mood}
+              stage={stage}
+              reaction={reaction}
+              hat={state.equippedHat}
+              floaters={floaters}
+              onTap={() => doAction("pet", "💖")}
+              isDead={state.isDead}
+              isCritical={isCritical}
+              palette={species.palette}
+              evolving={evolving}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* UI overlays */}
+      <div className="relative z-10 min-h-[100dvh] mx-auto flex max-w-md flex-col px-3 pt-[max(env(safe-area-inset-top),0.5rem)] pb-[max(env(safe-area-inset-bottom),0.5rem)] pointer-events-none">
+        {/* Header */}
+        <header className="flex items-center justify-between pointer-events-auto">
+          <div className="flex items-center gap-2 rounded-full glass-card px-2.5 py-1.5">
+            <div
+              className="grid place-items-center h-8 w-8 rounded-full text-sm"
+              style={{
+                background: `linear-gradient(135deg, ${species.palette.body[0]}, ${species.palette.body[2]})`,
+              }}
+            >
+              {species.emoji}
+            </div>
+            <div className="pr-1.5">
+              <h1 className="text-sm leading-tight font-bold">{displayName}</h1>
+              <p className="text-[10px] text-muted-foreground -mt-0.5">
+                {stageLabel(stage)} · Nv {state.level}
+              </p>
+            </div>
+          </div>
+          <div
+            className={`flex items-center gap-1.5 rounded-full glass-card px-2.5 py-1.5 ${
+              isDarkWp ? "text-white" : ""
+            }`}
+          >
+            <span className="text-[10px] font-bold uppercase tracking-wider">
+              {moodLabel(mood)}
+            </span>
+            <span className="h-3 w-px bg-current/30" />
+            <Coins className="h-3.5 w-3.5 text-[oklch(0.78_0.16_80)]" />
+            <span className="text-xs font-bold">{state.coins}</span>
+          </div>
+        </header>
+
+        {/* XP */}
+        <div className="mt-2 h-1 rounded-full bg-white/60 overflow-hidden pointer-events-auto">
+          <motion.div
+            className="h-full rounded-full bg-gradient-to-r from-primary to-[oklch(0.82_0.16_50)]"
+            initial={false}
+            animate={{ width: `${xpPct}%` }}
+            transition={{ type: "spring", stiffness: 120, damping: 20 }}
           />
         </div>
 
-        {/* Critical banner */}
+        {/* Mini stats — compact horizontal row */}
+        <section className="mt-2 pointer-events-auto">
+          <div className="flex items-center gap-1 rounded-full glass-card px-2 py-1.5">
+            {miniStats.map((s) => (
+              <MiniStat key={s.label} {...s} />
+            ))}
+          </div>
+        </section>
+
+        {/* Critical/greeting banners */}
         <AnimatePresence>
           {isCritical && (
             <motion.div
-              initial={{ y: -20, opacity: 0 }}
+              initial={{ y: -10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              exit={{ y: -20, opacity: 0 }}
-              className="absolute top-3 left-3 right-3 flex items-center gap-2 rounded-2xl bg-destructive/95 text-destructive-foreground px-3 py-2 shadow-lift"
+              exit={{ y: -10, opacity: 0 }}
+              className="mt-2 flex items-center gap-2 rounded-2xl bg-destructive/95 text-destructive-foreground px-3 py-2 shadow-lift pointer-events-auto"
             >
               <AlertTriangle className="h-4 w-4 shrink-0" />
               <span className="text-xs font-bold leading-tight">
-                {state.name} precisa de você agora! Alimente, hidrate ou dê remédio.
+                {state.name} precisa de você agora!
               </span>
             </motion.div>
           )}
         </AnimatePresence>
-
-        {/* Greeting */}
         <AnimatePresence>
           {greeting && !isCritical && (
             <motion.button
               onClick={dismissGreeting}
-              initial={{ y: -20, opacity: 0 }}
+              initial={{ y: -10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              exit={{ y: -20, opacity: 0 }}
-              className="absolute top-3 left-3 rounded-2xl glass-card px-3 py-2 text-xs font-bold shadow-soft"
+              exit={{ y: -10, opacity: 0 }}
+              className="mt-2 self-start rounded-2xl glass-card px-3 py-1.5 text-xs font-bold shadow-soft pointer-events-auto"
             >
               {greeting === "missed"
                 ? `😢 ${state.name} sentiu sua falta!`
@@ -218,84 +229,145 @@ function HomeScreen() {
           )}
         </AnimatePresence>
 
-        <div
-          className={`absolute top-3 right-3 rounded-full glass-card px-3 py-1 text-[11px] font-bold uppercase tracking-wider ${
-            isDarkWp ? "text-white" : ""
-          }`}
-        >
-          {moodLabel(mood)}
-        </div>
-      </section>
+        {/* Spacer — lets the pet breathe */}
+        <div className="flex-1" />
 
-      {/* Actions */}
-      <section className="mt-4 rounded-[1.75rem] glass-card p-3">
-        <div className="grid grid-cols-6 gap-1">
-          <ActionButton icon={Drumstick} label="Comer" tone="peach" onClick={() => doAction("feed", "🍗")} />
-          <ActionButton icon={Droplets} label="Beber" tone="sky" onClick={() => doAction("drink", "💧")} />
-          <ActionButton icon={Moon} label="Dormir" tone="lavender" onClick={() => doAction("sleep", "💤")} />
-          <ActionButton icon={ShowerHead} label="Banho" tone="mint" onClick={() => doAction("bath", "🫧")} />
-          <ActionButton icon={Gamepad2} label="Brincar" tone="pink" onClick={() => doAction("play", "🎈")} />
-          <ActionButton icon={Heart} label="Carinho" tone="pink" onClick={() => doAction("pet", "💖")} />
-        </div>
-      </section>
+        {/* Actions */}
+        <section className="rounded-full glass-card p-1.5 pointer-events-auto">
+          <div className="grid grid-cols-6 gap-0.5">
+            <MiniAction icon={Drumstick} label="Comer"   onClick={() => doAction("feed", "🍗")} />
+            <MiniAction icon={Droplets}  label="Beber"   onClick={() => doAction("drink", "💧")} />
+            <MiniAction icon={Moon}      label="Dormir"  onClick={() => doAction("sleep", "💤")} />
+            <MiniAction icon={ShowerHead}label="Banho"   onClick={() => doAction("bath", "🫧")} />
+            <MiniAction icon={Gamepad2}  label="Brincar" onClick={() => doAction("play", "🎈")} />
+            <MiniAction icon={Heart}     label="Carinho" onClick={() => doAction("pet", "💖")} />
+          </div>
+        </section>
 
-      {/* Bottom nav */}
-      <nav className="mt-3 flex items-center justify-around rounded-full glass-card px-2 py-2">
-        {[
-          { icon: Home, label: "Casa", onClick: () => setPanel(null), active: panel === null },
-          { icon: BookOpen, label: "Pokédex", onClick: () => setPanel("pokedex"), active: panel === "pokedex" },
-          { icon: ShoppingBag, label: "Loja", onClick: () => setPanel("shop"), active: panel === "shop" },
-          { icon: Gamepad2, label: "Jogos", onClick: () => setPanel("game"), active: panel === "game" },
-          { icon: Shirt, label: "Estilo", onClick: () => setPanel("wardrobe"), active: panel === "wardrobe" },
-        ].map(({ icon: Icon, label, onClick, active }) => (
-          <button
-            key={label}
-            onClick={onClick}
-            className={`flex flex-col items-center gap-0.5 rounded-2xl px-3 py-1.5 transition-colors ${
-              active ? "bg-primary text-primary-foreground shadow-soft" : "text-foreground/60"
-            }`}
-          >
-            <Icon className="h-4 w-4" strokeWidth={2.4} />
-            <span className="text-[9px] font-bold uppercase">{label}</span>
-          </button>
-        ))}
-      </nav>
+        {/* Bottom nav */}
+        <nav className="mt-1.5 flex items-center justify-around rounded-full glass-card px-1.5 py-1 pointer-events-auto">
+          {[
+            { icon: Home, label: "Casa", onClick: () => setPanel(null), active: panel === null },
+            { icon: BookOpen, label: "Pokédex", onClick: () => setPanel("pokedex"), active: panel === "pokedex" },
+            { icon: ShoppingBag, label: "Loja", onClick: () => setPanel("shop"), active: panel === "shop" },
+            { icon: Gamepad2, label: "Jogos", onClick: () => setPanel("game"), active: panel === "game" },
+            { icon: Shirt, label: "Estilo", onClick: () => setPanel("wardrobe"), active: panel === "wardrobe" },
+          ].map(({ icon: Icon, label, onClick, active }) => (
+            <button
+              key={label}
+              onClick={onClick}
+              className={`flex items-center justify-center rounded-full h-8 w-8 transition-colors ${
+                active ? "bg-primary text-primary-foreground shadow-soft" : "text-foreground/60"
+              }`}
+              aria-label={label}
+            >
+              <Icon className="h-4 w-4" strokeWidth={2.4} />
+            </button>
+          ))}
+        </nav>
 
-      <ShopModal
-        open={panel === "shop"}
-        onClose={() => setPanel(null)}
-        state={state}
-        buyItem={buyItem}
-        useItem={useItem}
-      />
-      <MemoryGame
-        open={panel === "game"}
-        onClose={() => setPanel(null)}
-        onWin={rewardGame}
-        bestScore={state.bestMemoryScore}
-      />
-      <WardrobeModal
-        open={panel === "wardrobe"}
-        onClose={() => setPanel(null)}
-        state={state}
-        equipHat={equipHat}
-        setWallpaper={setWallpaper}
-      />
-      <PokedexModal
-        open={panel === "pokedex"}
-        onClose={() => setPanel(null)}
-        game={game}
-        hatchSpecies={hatchSpecies}
-        setActive={(id) => { setActive(id); setPanel(null); }}
-        releaseDead={releaseDead}
-      />
-      <MemorialScreen
-        open={state.isDead}
-        memorial={state.memorial}
-        onNewPet={startNewPet}
-      />
+        <ShopModal
+          open={panel === "shop"}
+          onClose={() => setPanel(null)}
+          state={state}
+          buyItem={buyItem}
+          useItem={useItem}
+        />
+        <MemoryGame
+          open={panel === "game"}
+          onClose={() => setPanel(null)}
+          onWin={rewardGame}
+          bestScore={state.bestMemoryScore}
+        />
+        <WardrobeModal
+          open={panel === "wardrobe"}
+          onClose={() => setPanel(null)}
+          state={state}
+          equipHat={equipHat}
+          setWallpaper={setWallpaper}
+        />
+        <PokedexModal
+          open={panel === "pokedex"}
+          onClose={() => setPanel(null)}
+          game={game}
+          hatchSpecies={hatchSpecies}
+          setActive={(id) => { setActive(id); setPanel(null); }}
+          releaseDead={releaseDead}
+        />
+        <MemorialScreen
+          open={state.isDead}
+          memorial={state.memorial}
+          onNewPet={startNewPet}
+        />
       </div>
     </>
+  );
+}
+
+interface MiniStatProps {
+  icon: React.ComponentType<{ className?: string; strokeWidth?: number }>;
+  value: number;
+  tone: "hunger" | "thirst" | "energy" | "hygiene" | "fun" | "love";
+  label: string;
+}
+
+const TONE_BG: Record<MiniStatProps["tone"], string> = {
+  hunger: "bg-hunger",
+  thirst: "bg-thirst",
+  energy: "bg-energy",
+  hygiene: "bg-hygiene",
+  fun: "bg-fun",
+  love: "bg-love",
+};
+const TONE_TEXT: Record<MiniStatProps["tone"], string> = {
+  hunger: "text-hunger",
+  thirst: "text-thirst",
+  energy: "text-energy",
+  hygiene: "text-hygiene",
+  fun: "text-fun",
+  love: "text-love",
+};
+
+function MiniStat({ icon: Icon, value, tone, label }: MiniStatProps) {
+  const low = value < 30;
+  return (
+    <div
+      className="group relative flex-1 flex flex-col items-center gap-0.5"
+      title={`${label}: ${Math.round(value)}%`}
+    >
+      <Icon
+        className={`h-3.5 w-3.5 ${low ? "text-destructive" : TONE_TEXT[tone]}`}
+        strokeWidth={2.6}
+      />
+      <div className="h-1 w-full rounded-full bg-black/10 overflow-hidden">
+        <motion.div
+          className={`h-full rounded-full ${low ? "bg-destructive" : TONE_BG[tone]}`}
+          initial={false}
+          animate={{ width: `${Math.max(3, value)}%` }}
+          transition={{ type: "spring", stiffness: 140, damping: 22 }}
+        />
+      </div>
+    </div>
+  );
+}
+
+function MiniAction({
+  icon: Icon,
+  label,
+  onClick,
+}: {
+  icon: React.ComponentType<{ className?: string; strokeWidth?: number }>;
+  label: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      aria-label={label}
+      className="grid place-items-center h-10 rounded-full bg-white/80 hover:bg-white active:scale-95 transition-all shadow-[0_2px_6px_-2px_rgba(0,0,0,0.15)]"
+    >
+      <Icon className="h-4 w-4 text-foreground/80" strokeWidth={2.4} />
+    </button>
   );
 }
 
