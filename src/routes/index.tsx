@@ -25,7 +25,7 @@ import {
   stageLabel,
   evolutionName,
 } from "@/lib/pet-store";
-import { Pet } from "@/components/Pet";
+import { Pet3D as Pet } from "@/components/Pet3D";
 import { StatBar } from "@/components/StatBar";
 import { ActionButton } from "@/components/ActionButton";
 import { ShopModal } from "@/components/ShopModal";
