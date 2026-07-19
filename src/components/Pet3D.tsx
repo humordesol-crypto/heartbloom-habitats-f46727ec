@@ -517,6 +517,7 @@ export function Pet3D({
           camera={{ position: [0, 0.4, 4.5], fov: 32 }}
           gl={{ antialias: true, alpha: true }}
           style={{ background: "transparent", touchAction: "manipulation" }}
+          onCreated={({ gl }) => gl.setClearColor("#000000", 0)}
         >
           <Scene
             mood={mood}
