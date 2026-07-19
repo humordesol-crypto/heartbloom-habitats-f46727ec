@@ -451,7 +451,6 @@ function Creature({ mood, stage, palette, onTap, isDead, isCritical, hat }: Crea
 function Scene(props: CreatureProps) {
   return (
     <>
-      <color attach="background" args={["#00000000" as unknown as string]} />
       <ambientLight intensity={0.55} />
       <directionalLight
         position={[3, 5, 4]}
