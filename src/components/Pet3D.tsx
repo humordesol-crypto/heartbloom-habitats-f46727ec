@@ -462,7 +462,7 @@ function Scene(props: CreatureProps) {
       <pointLight position={[0, -2, 3]} intensity={0.5} color={props.palette.aura} />
 
       <Suspense fallback={null}>
-        <Environment preset="apartment" />
+        <Environment preset="apartment" background={false} />
       </Suspense>
 
       <Float floatIntensity={0.4} rotationIntensity={0.15} speed={1.2}>
