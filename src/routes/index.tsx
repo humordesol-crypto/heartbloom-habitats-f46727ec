@@ -127,7 +127,7 @@ function HomeScreen() {
         )}
 
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-[min(88vw,380px)] aspect-square">
+          <div className="w-[min(84vw,340px)] aspect-square">
             <Pet
               mood={mood}
               stage={stage}
