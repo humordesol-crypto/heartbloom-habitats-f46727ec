@@ -451,7 +451,6 @@ function Creature({ mood, stage, palette, onTap, isDead, isCritical, hat }: Crea
 function Scene(props: CreatureProps) {
   return (
     <>
-      <color attach="background" args={["#00000000" as unknown as string]} />
       <ambientLight intensity={0.55} />
       <directionalLight
         position={[3, 5, 4]}
@@ -463,7 +462,7 @@ function Scene(props: CreatureProps) {
       <pointLight position={[0, -2, 3]} intensity={0.5} color={props.palette.aura} />
 
       <Suspense fallback={null}>
-        <Environment preset="apartment" />
+        <Environment preset="apartment" background={false} />
       </Suspense>
 
       <Float floatIntensity={0.4} rotationIntensity={0.15} speed={1.2}>
@@ -502,7 +501,7 @@ export function Pet3D({
   useEffect(() => setMounted(true), []);
 
   return (
-    <div className="relative w-full h-full max-w-[420px] mx-auto select-none">
+    <div className="relative w-full h-full mx-auto select-none">
       {/* Soft aura */}
       <div
         className="absolute inset-6 rounded-full blur-3xl opacity-70 pointer-events-none"
@@ -515,9 +514,10 @@ export function Pet3D({
         <Canvas
           shadows
           dpr={[1, 2]}
-          camera={{ position: [0, 0.4, 4.2], fov: 32 }}
+          camera={{ position: [0, 0.4, 5.8], fov: 32 }}
           gl={{ antialias: true, alpha: true }}
-          style={{ touchAction: "manipulation" }}
+          style={{ background: "transparent", touchAction: "manipulation" }}
+          onCreated={({ gl }) => gl.setClearColor("#000000", 0)}
         >
           <Scene
             mood={mood}
