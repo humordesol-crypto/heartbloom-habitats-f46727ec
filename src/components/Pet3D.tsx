@@ -515,7 +515,7 @@ export function Pet3D({
         <Canvas
           shadows
           dpr={[1, 2]}
-          camera={{ position: [0, 0.4, 5.4], fov: 32 }}
+          camera={{ position: [0, 0.4, 4.4], fov: 32 }}
           gl={{ antialias: true, alpha: true }}
           style={{ touchAction: "manipulation" }}
         >
