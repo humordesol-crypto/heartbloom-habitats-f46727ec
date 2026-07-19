@@ -502,7 +502,7 @@ export function Pet3D({
   useEffect(() => setMounted(true), []);
 
   return (
-    <div className="relative w-full h-full max-w-[420px] mx-auto select-none">
+    <div className="relative w-full h-full mx-auto select-none">
       {/* Soft aura */}
       <div
         className="absolute inset-6 rounded-full blur-3xl opacity-70 pointer-events-none"
@@ -515,7 +515,7 @@ export function Pet3D({
         <Canvas
           shadows
           dpr={[1, 2]}
-          camera={{ position: [0, 0.4, 4.2], fov: 32 }}
+          camera={{ position: [0, 0.4, 5.4], fov: 32 }}
           gl={{ antialias: true, alpha: true }}
           style={{ touchAction: "manipulation" }}
         >
